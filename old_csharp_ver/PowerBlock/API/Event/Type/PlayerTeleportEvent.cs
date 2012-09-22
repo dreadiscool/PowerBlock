@@ -1,0 +1,11 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace PowerBlock.API.Event.Type
+{
+    public class PlayerTeleportEvent
+    {
+    }
+}
