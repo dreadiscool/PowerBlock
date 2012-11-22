@@ -1,4 +1,4 @@
-package me.dreadiscool;
+package com.craftera.server;
 
 import java.io.BufferedWriter;
 import java.io.FileReader;

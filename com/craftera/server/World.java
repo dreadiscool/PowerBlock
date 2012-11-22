@@ -1,12 +1,13 @@
-package me.dreadiscool;
+package com.craftera.server;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import me.dreadiscool.wrapper.BlockType;
-import me.dreadiscool.wrapper.Point3D;
+import com.craftera.api.BlockType;
+import com.craftera.api.Point3D;
 
-public class PowerWorld {
+
+public class World {
 
 	private String worldName;
 	private byte[] levelData;
@@ -15,7 +16,7 @@ public class PowerWorld {
 	private int height;
 	private ArrayList<String> players;
 	
-	public PowerWorld(String worldName) {
+	public World(String worldName) {
 		this.worldName = worldName;
 		this.players = new ArrayList<String>();
 		File f = new File(System.getProperty("user.dir") + File.separator + "worlds" + File.separator + worldName + ".pb");

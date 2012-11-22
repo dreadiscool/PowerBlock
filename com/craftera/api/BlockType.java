@@ -1,4 +1,4 @@
-package me.dreadiscool.wrapper;
+package com.craftera.api;
 
 public class BlockType {
 
