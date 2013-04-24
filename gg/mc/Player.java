@@ -3,6 +3,7 @@ package gg.mc;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.util.zip.GZIPOutputStream;
@@ -22,7 +23,7 @@ import gg.mc.network.packets.Packet5UpdateBlock;
 import gg.mc.network.packets.Packet8Position;
 
 public class Player {
-
+	
 	private ConnectionThread connectionThread;
 	private String inetAddress;
 	private PacketInputStream packetInputStream;
@@ -47,10 +48,16 @@ public class Player {
 				try {
 					Packet0Identification ident = (Packet0Identification) packetInputStream.nextPacket();
 					MessageDigest md5 = MessageDigest.getInstance("MD5");
-					byte[] token = ("1234567891234567" + ident.getUsername()).getBytes("UTF-8");
-					if (new String(md5.digest(token)).equals(ident.getVerificationKey())) {
+					byte[] token = (connectionThread.getSalt() + ident.getUsername()).getBytes("UTF-8");
+					String verificationToken = new BigInteger(md5.digest(token)).toString(16);
+					System.out.println(verificationToken + " vs " + ident.getVerificationKey());
+					if (verificationToken.equals(ident.getVerificationKey())) {
+						username = ident.getUsername();
 						loggedIn = true;
+						Configuration config = PowerBlock.getServer().getConfiguration();
+						packetOutputStream.writePacket(new Packet0Identification((byte) 7, config.getServerName(), config.getMotd(), (byte) 0));
 						connectionThread.addPlayer(this);
+						sendWorld(PowerBlock.getServer().getWorldManager().getMainWorld());
 					}
 					else {
 						kick("Failed to verify username!");
@@ -81,6 +88,7 @@ public class Player {
 		}
 		catch (Exception ex) {
 			kick("Failed to handle packet");
+			ex.printStackTrace();
 		}
 	}
 	
@@ -95,23 +103,21 @@ public class Player {
 			dos.write(worldData);
 			gos.finish();
 			byte[] gzip = bos.toByteArray();
-			int packets = (int) Math.ceil(gzip.length / 1024);
 			
 			packetOutputStream.writePacket(new Packet2Initialize());
+			
+			int packets = (int) Math.ceil((double) worldData.length / 1024);
 			for (int i = 0; i < packets; i++) {
-				byte[] buff;
-				if (gzip.length - (i * 1024) > 1024) {
-					buff = new byte[1024];
-				}
-				else {
-					buff = new byte[gzip.length - (i * 1024)];
-					int percent = (i / packets) * 100;
-					packetOutputStream.writePacket(new Packet3Chunk(buff, (byte) percent));
-				}
+				ByteArrayOutputStream builder = new ByteArrayOutputStream();
+				DataOutputStream packetBuilder = new DataOutputStream(builder);
+				byte[] buff = new byte[1024];
 				for (int k = 0; k < buff.length; k++) {
-					buff[k] = gzip[k + (i * 1024)];
+					buff[k] = (byte) 0;
 				}
+				short len = (short) Math.max(gzip.length - (i * 1024), 1024);
+				
 			}
+			
 			packetOutputStream.writePacket(new Packet4Finalize(world.getLength(), world.getHeight(), world.getDepth()));
 		}
 		catch (IOException ex) {
@@ -134,10 +140,10 @@ public class Player {
 	
 	public void kick(String message) {
 		if (loggedIn) {
-			System.out.println("[Server] " + getUsername() + " [" + getInetAddress() + "] disconnected from server");
+			System.out.println(getUsername() + " [" + getInetAddress() + "] disconnected from server");
 		}
 		else {
-			System.out.println("[Server] [" + getInetAddress() + "] lost connection to the server");
+			System.out.println("[" + getInetAddress() + "] lost connection to the server");
 		}
 		try {
 			packetOutputStream.writePacket(new Packet14Disconnect(message));

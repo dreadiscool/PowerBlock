@@ -44,6 +44,10 @@ public class WorldManager {
 		PowerBlock.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "World generation finished");
 	}
 	
+	public World getMainWorld() {
+		return getWorld("world");
+	}
+	
 	public int getTotalWorlds() {
 		return worlds.size();
 	}

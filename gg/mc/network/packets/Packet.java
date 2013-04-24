@@ -1,8 +1,5 @@
 package gg.mc.network.packets;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-
 public class Packet {
 	
 	protected static byte[] getBytes(short s) {
@@ -13,22 +10,17 @@ public class Packet {
 	}
 	
 	protected static byte[] getBytes(String s) {
-		StringBuilder sb = new StringBuilder(s);
-		if (sb.length() > 64) {
-			sb.setLength(64);
-		}
-		else {
-			while (sb.length() < 64) {
-				sb.append((byte) 0x00);
+		char[] chars = s.toCharArray();
+		byte[] buff = new byte[64];
+		for (int i = 0; i < 64; i++) {
+			if (i < chars.length) {
+				buff[i] = (byte) chars[i];
+			}
+			else {
+				buff[i] = (byte) 0x00;
 			}
 		}
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(bos);
-		try {
-			dos.writeChars(s);
-		}
-		catch (Exception ex) { /* Can never happen */ }
-		return bos.toByteArray();
+		return buff;
 	}
 	
 	protected static String getString(byte[] payload) {

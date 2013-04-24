@@ -1,5 +1,7 @@
 package gg.mc.heartbeat;
 
+import gg.mc.network.ConnectionThread;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,10 +9,12 @@ import java.net.URL;
 
 public class HeartbeatThread extends Thread {
 
+	private ConnectionThread connectionThread;
 	private boolean hasSuccess = false;
 	
-	public HeartbeatThread() {
+	public HeartbeatThread(ConnectionThread connectionThread) {
 		super("PowerBlock Heartbeat Thread");
+		this.connectionThread = connectionThread;
 	}
 	
 	@Override
@@ -25,7 +29,7 @@ public class HeartbeatThread extends Thread {
 					sb.append("&name=PowerBlock");
 					sb.append("&public=True");
 					sb.append("&version=7");
-					sb.append("&salt=1234567891234567");
+					sb.append("&salt=" + connectionThread.getSalt());
 					sb.append("&users=8999");
 					URL url = new URL(sb.toString().replace(" ", "%20"));
 					BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));

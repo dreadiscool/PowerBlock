@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionThread extends Thread {
@@ -17,11 +18,19 @@ public class ConnectionThread extends Thread {
 	private ServerSocket serverSocket;
 	private ConcurrentHashMap<String, Player> clients = new ConcurrentHashMap<String, Player>();
 	private ArrayList<Player> loginQueue = new ArrayList<Player>();
+	private String salt;
 	
 	public ConnectionThread() {
 		super("PowerBlock Connection Thread");
 		try {
 			serverSocket = new ServerSocket(25565);
+			String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			Random random = new Random();
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < 16; i++) {
+				sb.append(alphabet.charAt(random.nextInt(alphabet.length())));
+			}
+			this.salt = sb.toString();
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
@@ -104,6 +113,7 @@ public class ConnectionThread extends Thread {
 		synchronized (loginQueue) {
 			if (loginQueue.remove(p)) {
 				clients.put(p.getUsername(), p);
+				System.out.println(p.getUsername() + " has logged in");
 			}
 			else {
 				throw new NoSuchPlayerException();
@@ -113,5 +123,9 @@ public class ConnectionThread extends Thread {
 	
 	public Player getPlayer(String name) {
 		return clients.get(name);
+	}
+	
+	public String getSalt() {
+		return salt;
 	}
 }

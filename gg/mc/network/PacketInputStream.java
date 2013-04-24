@@ -55,6 +55,8 @@ public class PacketInputStream {
 			try { Thread.sleep(10); }
 			catch (Exception ex) { }
 		}
+		payload = new byte[getPacketLength(currentHeader)];
+		inputStream.read(payload);
 		Packet packet = null;
 		switch (currentHeader) {
 			case 0x00:

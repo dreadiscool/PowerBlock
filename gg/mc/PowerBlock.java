@@ -34,7 +34,8 @@ public class PowerBlock {
 	
 	private Thread connectionThread = new ConnectionThread();
 	private Thread serverThread = new ServerThread((ConnectionThread) connectionThread);
-	private Thread heartbeatThread = new HeartbeatThread();
+	private Thread heartbeatThread = new HeartbeatThread((ConnectionThread) connectionThread);
+	private Configuration configuration = new Configuration();
 	private WorldManager worldManager;
 	
 	private void startServer() {
@@ -80,5 +81,13 @@ public class PowerBlock {
 	
 	public Player[] getOnlinePlayers() {
 		return ((ConnectionThread) connectionThread).getOnlinePlayers();
+	}
+	
+	public Configuration getConfiguration() {
+		return configuration;
+	}
+	
+	public WorldManager getWorldManager() {
+		return worldManager;
 	}
 }
