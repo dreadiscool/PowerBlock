@@ -20,6 +20,7 @@ import gg.mc.network.packets.Packet3Chunk;
 import gg.mc.network.packets.Packet4Finalize;
 import gg.mc.network.packets.Packet5UpdateBlock;
 import gg.mc.network.packets.Packet8Position;
+import gg.mc.network.packets.PacketGWomClient;
 
 public class Player {
 	
@@ -83,6 +84,9 @@ public class Player {
 					sb.append("> ");
 					sb.append(((Packet13Message) incoming).getMessage());
 					PowerBlock.getServer().broadcastMessage(sb.toString());
+				}
+				else if (incoming instanceof PacketGWomClient) {
+					kick("Cheater cheater pumpkin eater... No WOM!");
 				}
 			}
 		}

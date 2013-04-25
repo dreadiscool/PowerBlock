@@ -5,6 +5,7 @@ import java.io.File;
 import gg.mc.exceptions.ServerRunningException;
 import gg.mc.heartbeat.HeartbeatThread;
 import gg.mc.network.ConnectionThread;
+import gg.mc.plugin.PluginManager;
 
 public class PowerBlock {
 
@@ -37,6 +38,7 @@ public class PowerBlock {
 	private Thread heartbeatThread = new HeartbeatThread((ConnectionThread) connectionThread);
 	private Configuration configuration = new Configuration();
 	private WorldManager worldManager;
+	private PluginManager pluginManager;
 	
 	private void startServer() {
 		connectionThread.start();
@@ -53,6 +55,8 @@ public class PowerBlock {
 			System.out.println("Generating default world...");
 			worldManager.createWorld("world", 256, 256, 256);
 		}
+		pluginManager = new PluginManager();
+		pluginManager.load();
 	}
 	
 	public void broadcastMessage(String message) {

@@ -23,6 +23,9 @@ public class PacketInputStream {
 			case 0x0d:
 				waitingLength = 65;
 				break;
+			case (byte) 'G':
+				waitingLength = 0;
+				break;
 		}
 		return waitingLength;
 	}
@@ -70,6 +73,9 @@ public class PacketInputStream {
 				break;
 			case 0x0d:
 				packet = new Packet13Message(payload);
+				break;
+			case (byte) 'G':
+				packet = new PacketGWomClient();
 				break;
 		}
 		currentHeader = -1;
