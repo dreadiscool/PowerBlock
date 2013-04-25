@@ -20,6 +20,7 @@ import gg.mc.network.packets.Packet2Initialize;
 import gg.mc.network.packets.Packet3Chunk;
 import gg.mc.network.packets.Packet4Finalize;
 import gg.mc.network.packets.Packet5UpdateBlock;
+import gg.mc.network.packets.Packet7SpawnPlayer;
 import gg.mc.network.packets.Packet8Position;
 
 public class Player {
@@ -101,27 +102,28 @@ public class Player {
 			
 			dos.writeInt(worldData.length);
 			dos.write(worldData);
+			dos.flush();
 			gos.finish();
 			byte[] gzip = bos.toByteArray();
 			
 			packetOutputStream.writePacket(new Packet2Initialize());
 			
-			int packets = (int) Math.ceil((double) worldData.length / 1024);
-			for (int i = 0; i < packets; i++) {
-				System.out.println(i);
-				byte[] buff = new byte[Math.min(gzip.length, 1024)];
-				for (int k = 0; k < buff.length; k++) {
-					buff[k] = gzip[k];
-				}
-				packetOutputStream.writePacket(new Packet3Chunk((short) buff.length, buff, (byte) 50));
-				byte[] cache = new byte[gzip.length - buff.length];
-				for (int k = buff.length; k < gzip.length; k++) {
-					cache[k - buff.length] = gzip[k];
-				}
+			int packets = (int) Math.ceil((double) gzip.length / 1024);
+			for (int i = 1; gzip.length > 0; i++) {
+				short len = (short) Math.min(gzip.length, 1024);
+				byte[] buff = new byte[len];
+				System.arraycopy(gzip, 0, buff, 0, len);
+				byte percent = (byte) ((i / packets) * 100);
+				packetOutputStream.writePacket(new Packet3Chunk(len, buff, percent));
+				byte[] cache = new byte[gzip.length - len];
+				System.arraycopy(gzip, len, cache, 0, gzip.length - len);
 				gzip = cache;
 			}
 			
+			System.out.println("Wrote " + packets + " packets");
+			
 			packetOutputStream.writePacket(new Packet4Finalize(world.getLength(), world.getHeight(), world.getDepth()));
+			packetOutputStream.writePacket(new Packet7SpawnPlayer((byte) 0, username, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
 		}
 		catch (IOException ex) {
 			kick(ex.getMessage());

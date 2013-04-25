@@ -24,7 +24,7 @@ public class ConnectionThread extends Thread {
 		super("PowerBlock Connection Thread");
 		try {
 			serverSocket = new ServerSocket(25565);
-			String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			String alphabet = "abcdefghijklmnopqrstuvwxyz";
 			Random random = new Random();
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < 16; i++) {
@@ -112,6 +112,9 @@ public class ConnectionThread extends Thread {
 	public void addPlayer(Player p) {
 		synchronized (loginQueue) {
 			if (loginQueue.remove(p)) {
+				if (clients.get(p.getUsername()) != null) {
+					clients.get(p.getUsername()).kick("You logged in from another location!");
+				}
 				clients.put(p.getUsername(), p);
 				System.out.println(p.getUsername() + " has logged in");
 			}
