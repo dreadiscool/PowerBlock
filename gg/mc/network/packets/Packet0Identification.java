@@ -17,7 +17,7 @@ public class Packet0Identification extends Packet {
 		super((byte) 0x00);
 		byte[] buff1 = Packet.getBytes(serverName);
 		byte[] buff2 = Packet.getBytes(motd);
-		this.payload = new byte[129];
+		this.payload = new byte[130];
 		this.payload[0] = version;
 		for (int i = 1; i < 65; i++) {
 			this.payload[i] = buff1[i - 1];
@@ -25,6 +25,7 @@ public class Packet0Identification extends Packet {
 		for (int i = 65; i < 129; i++) {
 			this.payload[i] = buff2[i - 65];
 		}
+		this.payload[129] = userType;
 	}
 	
 	public Packet0Identification(byte[] payload) {

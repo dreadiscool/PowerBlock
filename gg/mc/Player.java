@@ -50,17 +50,17 @@ public class Player {
 					MessageDigest md5 = MessageDigest.getInstance("MD5");
 					byte[] token = (connectionThread.getSalt() + ident.getUsername()).getBytes("UTF-8");
 					String verificationToken = new BigInteger(md5.digest(token)).toString(16);
-					System.out.println(verificationToken + " vs " + ident.getVerificationKey());
 					if (verificationToken.equals(ident.getVerificationKey())) {
 						username = ident.getUsername();
 						loggedIn = true;
 						Configuration config = PowerBlock.getServer().getConfiguration();
-						packetOutputStream.writePacket(new Packet0Identification((byte) 7, config.getServerName(), config.getMotd(), (byte) 0));
+						packetOutputStream.writePacket(new Packet0Identification((byte) 7, config.getServerName(), config.getMotd(), (byte) 0x00));
 						connectionThread.addPlayer(this);
 						sendWorld(PowerBlock.getServer().getWorldManager().getMainWorld());
 					}
 					else {
 						kick("Failed to verify username!");
+						System.out.println("Computed " + verificationToken + " but got " + ident.getVerificationKey());
 					}
 				}
 				catch (ClassCastException e) {
@@ -108,14 +108,17 @@ public class Player {
 			
 			int packets = (int) Math.ceil((double) worldData.length / 1024);
 			for (int i = 0; i < packets; i++) {
-				ByteArrayOutputStream builder = new ByteArrayOutputStream();
-				DataOutputStream packetBuilder = new DataOutputStream(builder);
-				byte[] buff = new byte[1024];
+				System.out.println(i);
+				byte[] buff = new byte[Math.min(gzip.length, 1024)];
 				for (int k = 0; k < buff.length; k++) {
-					buff[k] = (byte) 0;
+					buff[k] = gzip[k];
 				}
-				short len = (short) Math.max(gzip.length - (i * 1024), 1024);
-				
+				packetOutputStream.writePacket(new Packet3Chunk((short) buff.length, buff, (byte) 50));
+				byte[] cache = new byte[gzip.length - buff.length];
+				for (int k = buff.length; k < gzip.length; k++) {
+					cache[k - buff.length] = gzip[k];
+				}
+				gzip = cache;
 			}
 			
 			packetOutputStream.writePacket(new Packet4Finalize(world.getLength(), world.getHeight(), world.getDepth()));
