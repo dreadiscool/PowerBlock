@@ -15,12 +15,10 @@ import gg.mc.network.packets.Packet;
 import gg.mc.network.packets.Packet0Identification;
 import gg.mc.network.packets.Packet13Message;
 import gg.mc.network.packets.Packet14Disconnect;
-import gg.mc.network.packets.Packet1Ping;
 import gg.mc.network.packets.Packet2Initialize;
 import gg.mc.network.packets.Packet3Chunk;
 import gg.mc.network.packets.Packet4Finalize;
 import gg.mc.network.packets.Packet5UpdateBlock;
-import gg.mc.network.packets.Packet7SpawnPlayer;
 import gg.mc.network.packets.Packet8Position;
 
 public class Player {
@@ -50,7 +48,8 @@ public class Player {
 					Packet0Identification ident = (Packet0Identification) packetInputStream.nextPacket();
 					MessageDigest md5 = MessageDigest.getInstance("MD5");
 					byte[] token = (connectionThread.getSalt() + ident.getUsername()).getBytes("UTF-8");
-					String verificationToken = new BigInteger(md5.digest(token)).toString(16);
+					md5.update(token);
+					String verificationToken = new BigInteger(1, md5.digest()).toString(16);
 					if (verificationToken.equals(ident.getVerificationKey())) {
 						username = ident.getUsername();
 						loggedIn = true;
@@ -68,7 +67,7 @@ public class Player {
 					kick("Must send identification packet, smart one");
 				}
 			}
-			packetOutputStream.writePacket(new Packet1Ping());
+			//packetOutputStream.writePacket(new Packet1Ping());
 			if (packetInputStream.hasPacket()) {
 				Packet incoming = packetInputStream.nextPacket();
 				if (incoming instanceof Packet5UpdateBlock) {
@@ -99,33 +98,33 @@ public class Player {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			GZIPOutputStream gos = new GZIPOutputStream(bos);
 			DataOutputStream dos = new DataOutputStream(gos);
-			
 			dos.writeInt(worldData.length);
 			dos.write(worldData);
-			dos.flush();
-			gos.finish();
+			dos.close();
+			gos.close();
 			byte[] gzip = bos.toByteArray();
+			bos.close();
 			
 			packetOutputStream.writePacket(new Packet2Initialize());
 			
-			int packets = (int) Math.ceil((double) gzip.length / 1024);
-			for (int i = 1; gzip.length > 0; i++) {
-				short len = (short) Math.min(gzip.length, 1024);
-				byte[] buff = new byte[len];
-				System.arraycopy(gzip, 0, buff, 0, len);
-				byte percent = (byte) ((i / packets) * 100);
-				packetOutputStream.writePacket(new Packet3Chunk(len, buff, percent));
-				byte[] cache = new byte[gzip.length - len];
-				System.arraycopy(gzip, len, cache, 0, gzip.length - len);
-				gzip = cache;
+			int position = 0;
+			int length;
+			int percent;
+			byte[] buffer = new byte[1024];
+			while(position != gzip.length) {
+				length = Math.min(gzip.length - position, 1024);
+				System.arraycopy(gzip, position, buffer, 0, length);
+				percent = (int)(((double)(position + length) / (double)gzip.length) * 100);
+				packetOutputStream.writePacket(new Packet3Chunk((short) length, buffer, (byte) percent));
+				position += length;
 			}
 			
-			System.out.println("Wrote " + packets + " packets");
-			
 			packetOutputStream.writePacket(new Packet4Finalize(world.getLength(), world.getHeight(), world.getDepth()));
-			packetOutputStream.writePacket(new Packet7SpawnPlayer((byte) 0, username, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
+			packetOutputStream.writePacket(new Packet8Position((byte) -1, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
+			//packetOutputStream.writePacket(new Packet7SpawnPlayer((byte) 0, username, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
 		}
-		catch (IOException ex) {
+		catch (Exception ex) {
+			ex.printStackTrace();
 			kick(ex.getMessage());
 		}
 	}
@@ -133,8 +132,7 @@ public class Player {
 	public void sendMessage(String message) {
 		try {
 			packetOutputStream.writePacket(new Packet13Message(message));
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			kick();
 		}
 	}

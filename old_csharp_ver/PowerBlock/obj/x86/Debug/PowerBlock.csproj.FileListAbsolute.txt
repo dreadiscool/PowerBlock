@@ -1,5 +1,0 @@
-c:\users\paras\documents\visual studio 2010\Projects\PowerBlock\PowerBlock\obj\x86\Debug\ResolveAssemblyReference.cache
-c:\users\paras\documents\visual studio 2010\Projects\PowerBlock\PowerBlock\bin\Debug\PowerBlock.exe
-c:\users\paras\documents\visual studio 2010\Projects\PowerBlock\PowerBlock\bin\Debug\PowerBlock.pdb
-c:\users\paras\documents\visual studio 2010\Projects\PowerBlock\PowerBlock\obj\x86\Debug\PowerBlock.exe
-c:\users\paras\documents\visual studio 2010\Projects\PowerBlock\PowerBlock\obj\x86\Debug\PowerBlock.pdb

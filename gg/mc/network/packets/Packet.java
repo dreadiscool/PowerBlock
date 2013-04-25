@@ -4,8 +4,9 @@ public class Packet {
 	
 	protected static byte[] getBytes(short s) {
 		return new byte[] {
+				(byte) ((s >> 8) & 0xff),
 			(byte) (s & 0xff),
-			(byte) ((s >> 8) & 0xff)
+			
 		};
 	}
 	
