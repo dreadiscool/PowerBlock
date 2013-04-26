@@ -1,5 +1,7 @@
 package gg.mc.plugin;
 
+import gg.mc.events.*;
+import gg.mc.exceptions.InvalidEventException;
 import gg.mc.exceptions.InvalidPluginException;
 
 import java.io.BufferedReader;
@@ -17,10 +19,6 @@ public class PluginManager {
 
 	private ConcurrentHashMap<String, Plugin> plugins = new ConcurrentHashMap<String, Plugin>();
 	private Context context = Context.enter();
-	
-	public PluginManager() {
-		load();
-	}
 	
 	public void load() {
 		File[] filePlugins = new File(System.getProperty("user.dir") + File.separator + "plugins" + File.separator).listFiles();
@@ -76,6 +74,39 @@ public class PluginManager {
 			iter.next().onDisable();
 		}
 		Context.exit();
+	}
+	
+	public void callEvent(Event event) {
+		try {
+			Collection<Plugin> plgs = plugins.values();
+			Iterator<Plugin> iter = plgs.iterator();
+			if (event instanceof PlayerChatEvent) {
+				while (iter.hasNext()) {
+					iter.next().onPlayerChat((PlayerChatEvent) event);
+				}
+			}
+			else if (event instanceof PlayerKickEvent) {
+				while (iter.hasNext()) {
+					iter.next().onPlayerKick((PlayerKickEvent) event);
+				}
+			}
+			else if (event instanceof PlayerLoginEvent) {
+				while (iter.hasNext()) {
+					iter.next().onPlayerLogin((PlayerLoginEvent) event);
+				}
+			}
+			else if (event instanceof PlayerQuitEvent) {
+				while (iter.hasNext()) {
+					iter.next().onPlayerQuit((PlayerQuitEvent) event);
+				}
+			}
+			else {
+				throw new InvalidEventException(event);
+			}
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	public Context getContext() {

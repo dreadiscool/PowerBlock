@@ -17,7 +17,7 @@ public class Packet3Chunk extends Packet {
 			bos.write(data);
 			bos.write(percent);
 		}
-		catch (Exception ex) { ex.printStackTrace(); }
+		catch (Exception ex) { /* Should never happen */ }
 		this.setPayload(bos.toByteArray());
 	}
 }

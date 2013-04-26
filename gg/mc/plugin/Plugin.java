@@ -1,5 +1,8 @@
 package gg.mc.plugin;
 
+import gg.mc.PowerBlock;
+import gg.mc.events.*;
+
 import java.util.ArrayList;
 
 import org.mozilla.javascript.Context;
@@ -28,8 +31,14 @@ public class Plugin {
 		sb.setLength(sb.length() - 1);
 		this.code = sb.toString();
 		scope = pluginManager.getContext().initStandardObjects();
+		
+		// Global variables
 		Object printWrapper = Context.javaToJS(System.out, scope);
 		ScriptableObject.putProperty(scope, "console", printWrapper);
+		Object self = Context.javaToJS(this, scope);
+		ScriptableObject.putProperty(scope, "instance", self);
+		Object server = Context.javaToJS(PowerBlock.getServer(), scope);
+		ScriptableObject.putProperty(scope, "$", server);
 	}
 	
 	public void onEnable() {
@@ -41,9 +50,51 @@ public class Plugin {
 		catch (ClassCastException ex) {
 			System.out.println("Nag plugin author " + getAuthor() + " for not having an onEnable() function!");
 		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	public void onDisable() {
+		try {
+			Function onDisable = (Function) scope.get("onDisable", scope);
+			onDisable.call(pluginManager.getContext(), scope, scope, new Object[] { });
+		}
+		catch (ClassCastException ex) {
+			// No onDisable(), meh, idc
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void onPlayerLogin(PlayerLoginEvent e) {
+		try {
+			Function playerLogin = (Function) scope.get("onPlayerLogin", scope);
+			playerLogin.call(pluginManager.getContext(), scope, scope, new Object[] { e });
+		}
+		catch (ClassCastException ex) { }
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void onPlayerQuit(PlayerQuitEvent e) {
+		try {
+			Function playerLogin = (Function) scope.get("onPlayerLogin", scope);
+			playerLogin.call(pluginManager.getContext(), scope, scope, new Object[] { e });
+		}
+		catch (ClassCastException ex) { }
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void onPlayerKick(PlayerKickEvent e) {
+		
+	}
+	
+	public void onPlayerChat(PlayerChatEvent e) {
 		
 	}
 	
