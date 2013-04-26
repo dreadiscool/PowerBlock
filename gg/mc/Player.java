@@ -32,6 +32,8 @@ public class Player {
 	
 	private String username;
 	private boolean loggedIn = false;
+	// In the future, just remove them. This is used to hide logged off spam.
+	private boolean disconnected = false;
 	
 	public Player(ConnectionThread connectionThread, Socket socket) throws IOException {
 		this.connectionThread = connectionThread;
@@ -155,11 +157,13 @@ public class Player {
 	}
 	
 	public void kick(String message) {
-		if (loggedIn) {
-			System.out.println(getUsername() + " [" + getInetAddress() + "] disconnected from server");
-		}
-		else {
-			System.out.println("[" + getInetAddress() + "] lost connection to the server");
+		if (!disconnected) {
+			if (loggedIn) {
+				System.out.println(getUsername() + " [" + getInetAddress() + "] disconnected from server");
+			}
+			else {
+				System.out.println("[" + getInetAddress() + "] lost connection to the server");
+			}
 		}
 		try {
 			packetOutputStream.writePacket(new Packet14Disconnect(message));
@@ -168,6 +172,7 @@ public class Player {
 			// Well hell, they were getting kicked anyway
 		}
 		connectionThread.removePlayer(this);
+		disconnected = true;
 	}
 	
 	/**

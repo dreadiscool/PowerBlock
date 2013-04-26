@@ -33,7 +33,7 @@ public class Plugin {
 		scope = pluginManager.getContext().initStandardObjects();
 		
 		// Global variables
-		Object printWrapper = Context.javaToJS(System.out, scope);
+		Object printWrapper = Context.javaToJS(new PrintWrapper(this, System.out), scope);
 		ScriptableObject.putProperty(scope, "console", printWrapper);
 		Object self = Context.javaToJS(this, scope);
 		ScriptableObject.putProperty(scope, "instance", self);
