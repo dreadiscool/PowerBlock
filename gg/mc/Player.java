@@ -132,6 +132,7 @@ public class Player {
 				position += length;
 			}
 			
+			// Removed packet 7 spawn was screwing stuff up
 			packetOutputStream.writePacket(new Packet4Finalize(world.getLength(), world.getHeight(), world.getDepth()));
 			packetOutputStream.writePacket(new Packet8Position((byte) -1, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
 		}
