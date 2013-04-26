@@ -9,3 +9,9 @@ It's extremely easy to pick up. Since scripts are written in JavaScript, you can
 As we continue to create the server, we will add more tutorials. Here is an example plugin that changes the login message for players
 
 https://dl.dropboxusercontent.com/u/29419562/LoginMessage.js
+
+Also, as mentioned before, Sublime is awesome! Check out how the above source code looks in the Sublime text editor.
+
+http://gyazo.com/453bb9b782a8202aef8117b09812bd38
+
+Did we mention Sublime is free? :-)
