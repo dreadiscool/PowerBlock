@@ -20,7 +20,6 @@ import gg.mc.network.packets.Packet2Initialize;
 import gg.mc.network.packets.Packet3Chunk;
 import gg.mc.network.packets.Packet4Finalize;
 import gg.mc.network.packets.Packet5UpdateBlock;
-import gg.mc.network.packets.Packet7SpawnPlayer;
 import gg.mc.network.packets.Packet8Position;
 import gg.mc.network.packets.PacketGWomClient;
 
@@ -135,7 +134,6 @@ public class Player {
 			
 			packetOutputStream.writePacket(new Packet4Finalize(world.getLength(), world.getHeight(), world.getDepth()));
 			packetOutputStream.writePacket(new Packet8Position((byte) -1, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
-			packetOutputStream.writePacket(new Packet7SpawnPlayer((byte) 0, username, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
 		}
 		catch (Exception ex) {
 			kick(ex.getMessage());

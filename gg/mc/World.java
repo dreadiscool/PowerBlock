@@ -28,8 +28,8 @@ public class World {
 		}
 		for (int z = 0; z < depth; z++) {
 			for (int x = 0; x < length; x++) {
-				setBlockAt(x, 1, z, (byte) 5);
-				setBlockAt(x, 2, z, (byte) 4);
+				setBlockAt(x, 1, z, Block.Dirt);
+				setBlockAt(x, 2, z, Block.Grass);
 			}
 		}
 	}
