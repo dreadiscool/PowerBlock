@@ -49,6 +49,7 @@ public class PluginManager {
 						}
 						in = br.readLine();
 					}
+					br.close();
 					if (pluginName.equals("Unknown")) {
 						throw new InvalidPluginException(filePlugins[i].getAbsolutePath());
 					}

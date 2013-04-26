@@ -28,14 +28,14 @@ public class World {
 		}
 		for (int z = 0; z < depth; z++) {
 			for (int x = 0; x < length; x++) {
-				setBlockAt(x, 0, z, (byte) 5);
-				setBlockAt(x, 1, z, (byte) 6);
+				setBlockAt(x, 1, z, (byte) 5);
+				setBlockAt(x, 2, z, (byte) 4);
 			}
 		}
 	}
 	
 	private int getDataPosition(short x, short y, short z) {
-		return x + (z * depth) + (y * depth * height);
+		return (z * this.height + y) * this.length + x;
 	}
 	
 	public byte getBlockAt(short x, short y, short z) {

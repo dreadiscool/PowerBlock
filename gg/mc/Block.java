@@ -1,5 +1,56 @@
 package gg.mc;
 
 public class Block {
-
+	
+	public static final byte Air = (byte) 0;
+	public static final byte Stone = (byte) 1;
+	public static final byte Grass = (byte) 2;
+	public static final byte Dirt = (byte) 3;
+	public static final byte Cobblestone = (byte) 3;
+	public static final byte Wood = (byte) 5;
+	public static final byte Leaves = (byte) 6;
+	public static final byte Bedrock = (byte) 7;
+	public static final byte Water = (byte) 8;
+	public static final byte StillWater = (byte) 9;
+	public static final byte Lava = (byte) 10;
+	public static final byte StillLava = (byte) 11;
+	public static final byte Sand = (byte) 12;
+	public static final byte Gravel = (byte) 13;
+	public static final byte GoldOre = (byte) 14;
+	public static final byte IronOre = (byte) 15;
+	public static final byte CoalOre = (byte) 16;
+	public static final byte Tree = (byte) 17;
+	public static final byte Shrub = (byte) 18;
+	public static final byte Sponge = (byte) 19;
+	public static final byte Glass = (byte) 20;
+	public static final byte WoolRed = (byte) 21;
+	public static final byte WoolOrange = (byte) 22;
+	public static final byte WoolYellow = (byte) 23;
+	public static final byte WoolLightGreen = (byte) 24;
+	public static final byte WoolGreen = (byte) 25;
+	public static final byte WoolAqua = (byte) 26;
+	public static final byte WoolCyan = (byte) 27;
+	public static final byte WoolLightBlue = (byte) 28;
+	public static final byte WoolBlue = (byte) 29;
+	public static final byte WoolPurple = (byte) 30;
+	public static final byte WoolLightPurple = (byte) 31;
+	public static final byte WoolPink = (byte) 32;
+	public static final byte WoolDarkPink = (byte) 33;
+	public static final byte WoolDarkGray = (byte) 34;
+	public static final byte WoolLightGray = (byte) 35;
+	public static final byte WoolWhite = (byte) 36;
+	public static final byte FlowerYellow = (byte) 37;
+	public static final byte FlowerRed = (byte) 38;
+	public static final byte MushroomNormal = (byte) 39;
+	public static final byte MushroomRed = (byte) 40;
+	public static final byte BlockGold = (byte) 41;
+	public static final byte BlockIron = (byte) 42;
+	public static final byte SlabDouble = (byte) 43;
+	public static final byte SlabSingle = (byte) 44;
+	public static final byte Bricks = (byte) 45;
+	public static final byte Tnt = (byte) 46;
+	public static final byte Bookshelf = (byte) 47;
+	public static final byte Mossycobble = (byte) 48;
+	public static final byte Obsidian = (byte) 49;
+	public static final byte Zero = (byte) 0xff;
 }
