@@ -1,9 +1,7 @@
 package gg.mc.network.packets;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 
 public class Packet5UpdateBlock extends Packet {
 
@@ -25,21 +23,6 @@ public class Packet5UpdateBlock extends Packet {
 			this.blockType = dis.readByte();
 		}
 		catch (Exception ex) { /* Should never happen */ }
-	}
-	
-	public Packet5UpdateBlock(short xPos, short yPos, short zPos, byte mode, byte blockType) {
-		super((byte) 0x05);
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(bos);
-		try {
-			dos.writeShort(xPos);
-			dos.writeShort(yPos);
-			dos.writeShort(zPos);
-			dos.writeByte(mode);
-			dos.writeByte(blockType);
-		}
-		catch (Exception ex) { /* Should never happen */ }
-		this.setPayload(bos.toByteArray());
 	}
 	
 	public short getXPos() {

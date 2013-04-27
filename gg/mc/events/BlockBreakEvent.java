@@ -3,7 +3,7 @@ package gg.mc.events;
 import gg.mc.Player;
 import gg.mc.Position;
 
-public class BlockBreakEvent extends Event{
+public class BlockBreakEvent extends Event {
 
 	Player p;
 	Position pos;
@@ -29,12 +29,7 @@ public class BlockBreakEvent extends Event{
 		return b1;
 	}
 	
-	public Byte getNewBlock() {
+	public Byte getBlockBroken() {
 		return b2;
 	}
-	
-	public void setNewBlock(Byte b) {
-		this.b2 = b;
-	}
-	
 }

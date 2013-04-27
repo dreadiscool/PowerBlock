@@ -9,6 +9,7 @@ import java.security.MessageDigest;
 import java.util.zip.GZIPOutputStream;
 
 import gg.mc.events.BlockBreakEvent;
+import gg.mc.events.BlockPlaceEvent;
 import gg.mc.events.PlayerChatEvent;
 import gg.mc.events.PlayerKickEvent;
 import gg.mc.events.PlayerKickEvent.Reason;
@@ -25,6 +26,7 @@ import gg.mc.network.packets.Packet2Initialize;
 import gg.mc.network.packets.Packet3Chunk;
 import gg.mc.network.packets.Packet4Finalize;
 import gg.mc.network.packets.Packet5UpdateBlock;
+import gg.mc.network.packets.Packet6SetBlock;
 import gg.mc.network.packets.Packet8Position;
 import gg.mc.network.packets.PacketGWomClient;
 
@@ -63,6 +65,7 @@ public class Player {
 						username = ident.getUsername();
 						loggedIn = true;
 						Configuration config = PowerBlock.getServer().getConfiguration();
+						packetOutputStream.writePacket(new Packet0Identification((byte) 7, config.getServerName(), config.getMotd(), (byte) 0x00));
 						connectionThread.addPlayer(this);
 						
 						// Event
@@ -72,12 +75,11 @@ public class Player {
 							PowerBlock.getServer().broadcastMessage(e.getJoinMessage());
 						}
 						
-						packetOutputStream.writePacket(new Packet0Identification((byte) 7, config.getServerName(), config.getMotd(), (byte) 0x00));
+						
 						sendWorld(PowerBlock.getServer().getWorldManager().getMainWorld());
 					}
 					else {
 						kick("Failed to verify username!", Reason.LOST_CONNECTION);
-						System.out.println("Computed " + verificationToken + " but got " + ident.getVerificationKey());
 					}
 				}
 				catch (ClassCastException e) {
@@ -88,20 +90,26 @@ public class Player {
 				Packet incoming = packetInputStream.nextPacket();
 				if (incoming instanceof Packet5UpdateBlock) {
 					Packet5UpdateBlock packet = (Packet5UpdateBlock) incoming;
-					if(packet.getMode() == 0x01) { //The block was placed;
-						
-					}else //Block was broken;
-					{
-						//Get the old block to pass to BlockBreakEvent;
-						byte b1 = PowerBlock.getServer().getWorldManager().getMainWorld().getBlockAt(packet.getXPos(), packet.getYPos(), packet.getZPos());
-						//Create our new event;
-						BlockBreakEvent e = new BlockBreakEvent(this, new Position(packet.getXPos(), packet.getYPos(), packet.getZPos(), (byte)0, (byte)0), b1, packet.getBlockType());
+					byte b1 = PowerBlock.getServer().getWorldManager().getMainWorld().getBlockAt(packet.getXPos(), packet.getYPos(), packet.getZPos());
+					if (packet.getMode() == 0x01) { //The block was placed;
+						// Event
+						BlockPlaceEvent e = new BlockPlaceEvent(this, packet.getXPos(), packet.getYPos(), packet.getZPos(), packet.getBlockType());
 						PowerBlock.getServer().getPluginManager().callEvent(e);
-						if(e.getOldBlock() != Block.Air)
-							e.setCancelled(true);
-						if(e.isCancelled())
+						if (e.isCancelled()) {
+							packetOutputStream.writePacket(new Packet6SetBlock(packet.getXPos(), packet.getYPos(), packet.getZPos(), b1));
+						}
+						PowerBlock.getServer().getWorldManager().getMainWorld().setBlockAt(e.getPosition(), e.getBlockPlaced());
+					}
+					else {
+						// Event
+						BlockBreakEvent e = new BlockBreakEvent(this, new Position(packet.getXPos(), packet.getYPos(), packet.getZPos(), (byte) 0, (byte) 0), b1, packet.getBlockType());
+						PowerBlock.getServer().getPluginManager().callEvent(e);
+						if (e.isCancelled()) {
+							// Can't just return, must echo back to prevent sluggish feel
+							packetOutputStream.writePacket(new Packet6SetBlock(packet.getXPos(), packet.getYPos(), packet.getZPos(), b1));
 							return;
-						PowerBlock.getServer().getWorldManager().getMainWorld().setBlockAt(e.getPosition(), e.getNewBlock());
+						}
+						PowerBlock.getServer().getWorldManager().getMainWorld().setBlockAt(e.getPosition(), e.getBlockBroken());
 					}
 				}
 				else if (incoming instanceof Packet8Position) {

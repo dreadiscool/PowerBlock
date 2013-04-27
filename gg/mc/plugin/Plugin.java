@@ -124,11 +124,21 @@ public class Plugin {
 		}
 	}
 	
-	public void onBlockBreak(BlockBreakEvent e)
-	{
+	public void onBlockBreak(BlockBreakEvent e) {
 		try {
 			Function blockBreak = (Function) scope.get("onBlockBreak", scope);
 			blockBreak.call(pluginManager.getContext(), scope, scope, new Object[] { e });
+		}
+		catch (ClassCastException ex) { }
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void onBlockPlace(BlockPlaceEvent e) {
+		try {
+			Function blockPlace = (Function) scope.get("onBlockPlace", scope);
+			blockPlace.call(pluginManager.getContext(), scope, scope, new Object[] { e });
 		}
 		catch (ClassCastException ex) { }
 		catch (Exception ex) {
