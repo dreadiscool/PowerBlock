@@ -118,7 +118,7 @@ public class PluginManager {
 				// In the future allow custom events maybe?
 				// Yeah, you have to do that thing, pull, then press f5 on the project
 				// in package explorer. then, to commit ur changes, you do this. first
-				// save everything.
+				// save everything. Make sure you ALWAYS do Commit AND PUSH. and dere u go thanks ;o
 			}
 		}
 		catch (Exception ex) {

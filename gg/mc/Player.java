@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.util.zip.GZIPOutputStream;
 
+import gg.mc.events.PlayerKickEvent;
 import gg.mc.events.PlayerLoginEvent;
 import gg.mc.network.ConnectionThread;
 import gg.mc.network.PacketInputStream;
@@ -165,8 +166,13 @@ public class Player {
 				System.out.println("[" + getInetAddress() + "] lost connection to the server");
 			}
 		}
+		PlayerKickEvent e = new PlayerKickEvent("Server" , this, message);
+		PowerBlock.getServer().getPluginManager().callEvent(e);
+		if (e.getReason() != null) {
+			PowerBlock.getServer().broadcastMessage(e.getPlayer().getUsername() + " was kicked for " + e.getReason());
+		}
 		try {
-			packetOutputStream.writePacket(new Packet14Disconnect(message));
+			packetOutputStream.writePacket(new Packet14Disconnect(e.getReason()));
 		}
 		catch (Exception ex) {
 			// Well hell, they were getting kicked anyway

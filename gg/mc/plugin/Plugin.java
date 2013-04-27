@@ -81,7 +81,7 @@ public class Plugin {
 	
 	public void onPlayerQuit(PlayerQuitEvent e) {
 		try {
-			Function playerLogin = (Function) scope.get("onPlayerLogin", scope);
+			Function playerLogin = (Function) scope.get("onPlayerQuit", scope);
 			playerLogin.call(pluginManager.getContext(), scope, scope, new Object[] { e });
 		}
 		catch (ClassCastException ex) { }
