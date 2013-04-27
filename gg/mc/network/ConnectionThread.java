@@ -6,6 +6,7 @@ import gg.mc.exceptions.NoSuchPlayerException;
 import gg.mc.network.packets.Packet;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -51,6 +52,10 @@ public class ConnectionThread extends Thread {
 					synchronized (loginQueue) {
 						loginQueue.add(new Player(this, s));
 					}
+				}
+				catch (InterruptedIOException ex) {
+					// Pass it off to lower exception handler
+					throw new InterruptedException();
 				}
 				catch (IOException ex) {
 					if (s != null) {

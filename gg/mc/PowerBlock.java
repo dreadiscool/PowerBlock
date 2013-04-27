@@ -1,6 +1,7 @@
 package gg.mc;
 
 import java.io.File;
+import java.util.Scanner;
 
 import gg.mc.exceptions.ServerRunningException;
 import gg.mc.heartbeat.HeartbeatThread;
@@ -31,6 +32,26 @@ public class PowerBlock {
 		}
 		instance = new PowerBlock();
 		instance.startServer();
+		
+		Scanner s = new Scanner(System.in);
+		s.useDelimiter(System.getProperty("line.separator"));
+		while (s.hasNext()) {
+			String[] cmdRaw = s.next().split(" ");
+			String cmd = cmdRaw[0];
+			String[] cmdArgs = new String[cmdRaw.length - 1];
+			System.arraycopy(cmdRaw, 1, cmdArgs, 0, cmdArgs.length);
+			if (cmd.equalsIgnoreCase("stop")) {
+				if (cmdArgs.length == 0) {
+					PowerBlock.getServer().stop();
+					break;
+				}
+				else {
+					System.out.println("Command 'stop' takes no arguments. Type 'stop' to stop the server.");
+				}
+			}
+			PowerBlock.getServer().getPluginManager().callConsoleCommand(cmd, cmdArgs);
+		}
+		s.close();
 	}
 	
 	private Thread connectionThread = new ConnectionThread();
@@ -43,7 +64,6 @@ public class PowerBlock {
 	private void startServer() {
 		connectionThread.start();
 		serverThread.start();
-		// heartbeatThread.start();
 		try {
 			worldManager = new WorldManager();
 		}
@@ -71,15 +91,12 @@ public class PowerBlock {
 	}
 	
 	public void stop() {
+		System.out.println("Server shutting down...");
+		pluginManager.unload();
 		connectionThread.interrupt();
 		serverThread.interrupt();
 		heartbeatThread.interrupt();
-		while (connectionThread.isAlive()) { }
-		System.out.println("Connection thread shut down");
-		while (serverThread.isAlive()) { }
-		System.out.println("Event thread shut down");
-		while (heartbeatThread.isAlive()) { }
-		System.out.println("Heartbeat thread shut down");
+		System.exit(0);
 	}
 	
 	public Player getOnlinePlayer(String name) {

@@ -20,9 +20,11 @@ import org.mozilla.javascript.Context;
 public class PluginManager {
 
 	private ConcurrentHashMap<String, Plugin> plugins = new ConcurrentHashMap<String, Plugin>();
-	private Context context = Context.enter();
+	private Context context;
 	
 	public void load() {
+		plugins.clear();
+		context = Context.enter();
 		File[] filePlugins = new File(System.getProperty("user.dir") + File.separator + "plugins" + File.separator).listFiles();
 		for (int i = 0; i < filePlugins.length; i++) {
 			if (filePlugins[i].getAbsolutePath().endsWith(".js") && !filePlugins[i].isDirectory()) {
@@ -150,6 +152,25 @@ public class PluginManager {
 		}
 		if (!handled) {
 			player.sendMessage(ChatColor.WHITE + "Unknown command. Type /help for help.");
+		}
+	}
+	
+	public void callConsoleCommand(String command, String[] args) {
+		boolean handled = false;
+		try {
+			Collection<Plugin> plgs = plugins.values();
+			Iterator<Plugin> iter = plgs.iterator();
+			while (iter.hasNext()) {
+				if (iter.next().onConsoleCommand(command, args)) {
+					handled = true;
+				}
+			}
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		if (!handled) {
+			System.out.println("Unknown command '" + command + "'. Type 'help' for help.");
 		}
 	}
 	
