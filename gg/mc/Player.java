@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.util.zip.GZIPOutputStream;
 
+import gg.mc.events.BlockBreakEvent;
 import gg.mc.events.PlayerChatEvent;
 import gg.mc.events.PlayerKickEvent;
 import gg.mc.events.PlayerKickEvent.Reason;
@@ -86,7 +87,20 @@ public class Player {
 			if (packetInputStream.hasPacket()) {
 				Packet incoming = packetInputStream.nextPacket();
 				if (incoming instanceof Packet5UpdateBlock) {
-					
+					Packet5UpdateBlock packet = (Packet5UpdateBlock) incoming;
+					if(packet.getMode() == 0x01) { //The block was placed;
+						
+					}else //Block was broken;
+					{
+						//Get the old block to pass to BlockBreakEvent;
+						byte b1 = PowerBlock.getServer().getWorldManager().getMainWorld().getBlockAt(packet.getXPos(), packet.getYPos(), packet.getZPos());
+						//Create our new event;
+						BlockBreakEvent e = new BlockBreakEvent(this, new Position(packet.getXPos(), packet.getYPos(), packet.getZPos(), (byte)0, (byte)0), b1, packet.getBlockType());
+						PowerBlock.getServer().getPluginManager().callEvent(e);
+						if(e.isCancelled())
+							return;
+						PowerBlock.getServer().getWorldManager().getMainWorld().setBlockAt(e.getPosition(), e.getNewBlock());
+					}
 				}
 				else if (incoming instanceof Packet8Position) {
 					

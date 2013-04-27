@@ -1,7 +1,5 @@
 package gg.mc;
 
-import gg.mc.events.BlockChangeEvent;
-
 public class World {
 
 	private String name;
@@ -49,11 +47,6 @@ public class World {
 	}
 	
 	public void setBlockAt(short x, short y, short z, byte block) {
-		BlockChangeEvent e = new BlockChangeEvent(new Position(x,y,z, (byte) 0, (byte) 0), getBlockAt(x,y,z), block);
-		PowerBlock.getServer().getPluginManager().callEvent(e);
-		if(e.isCancelled()) {
-			return;
-		}
 		data[getDataPosition(x, y, z)] = block;
 	}
 	
