@@ -9,6 +9,7 @@ import java.security.MessageDigest;
 import java.util.zip.GZIPOutputStream;
 
 import gg.mc.events.PlayerKickEvent;
+import gg.mc.events.PlayerKickEvent.Reason;
 import gg.mc.events.PlayerLoginEvent;
 import gg.mc.network.ConnectionThread;
 import gg.mc.network.PacketInputStream;
@@ -72,12 +73,12 @@ public class Player {
 						sendWorld(PowerBlock.getServer().getWorldManager().getMainWorld());
 					}
 					else {
-						kick("Failed to verify username!");
+						kick("Failed to verify username!", Reason.LOST_CONNECTION);
 						System.out.println("Computed " + verificationToken + " but got " + ident.getVerificationKey());
 					}
 				}
 				catch (ClassCastException e) {
-					kick("Must send identification packet, smart one");
+					kick("Must send identification packet, smart one", Reason.LOST_CONNECTION);
 				}
 			}
 			if (packetInputStream.hasPacket()) {
@@ -97,12 +98,12 @@ public class Player {
 					PowerBlock.getServer().broadcastMessage(sb.toString());
 				}
 				else if (incoming instanceof PacketGWomClient) {
-					kick("Cheater cheater pumpkin eater... No WOM!");
+					kick("Cheater cheater pumpkin eater... No WOM!", Reason.PLUGIN_KICK);
 				}
 			}
 		}
 		catch (Exception ex) {
-			kick("Failed to handle packet");
+			kick(ex.getMessage(), Reason.LOST_CONNECTION);
 			ex.printStackTrace();
 		}
 	}
@@ -140,7 +141,7 @@ public class Player {
 			packetOutputStream.writePacket(new Packet8Position((byte) -1, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
 		}
 		catch (Exception ex) {
-			kick(ex.getMessage());
+			kick(ex.getMessage(), Reason.LOST_CONNECTION);
 		}
 	}
 	
@@ -149,15 +150,15 @@ public class Player {
 			packetOutputStream.writePacket(new Packet13Message(message));
 		}
 		catch (Exception ex) {
-			kick();
+			kick(ex.getMessage(), Reason.LOST_CONNECTION);
 		}
 	}
 	
-	public void kick() {
-		kick("Disconnected from server");
+	public void kick(String message) {
+		kick(message, Reason.PLUGIN_KICK);
 	}
 	
-	public void kick(String message) {
+	public void kick(String message, Reason reason) {
 		if (!disconnected) {
 			if (loggedIn) {
 				System.out.println(getUsername() + " [" + getInetAddress() + "] disconnected from server");
@@ -166,13 +167,19 @@ public class Player {
 				System.out.println("[" + getInetAddress() + "] lost connection to the server");
 			}
 		}
-		PlayerKickEvent e = new PlayerKickEvent("Server", this, message);
-		PowerBlock.getServer().getPluginManager().callEvent(e);
-		if (e.getReason() == null) {
-			e.setReason("You were kicked from the server!");
+		if (reason != Reason.LOST_CONNECTION) {
+			PlayerKickEvent e = new PlayerKickEvent("Server", this, message);
+			PowerBlock.getServer().getPluginManager().callEvent(e);
+			if (e.isCancelled()) {
+				return;
+			}
+			if (e.getReason() == null) {
+				e.setReason("You were kicked from the server!");
+			}
+			message = e.getReason();
 		}
 		try {
-			packetOutputStream.writePacket(new Packet14Disconnect(e.getReason()));
+			packetOutputStream.writePacket(new Packet14Disconnect(message));
 		}
 		catch (Exception ex) {
 			// Well hell, they were getting kicked anyway
@@ -190,7 +197,7 @@ public class Player {
 			packetOutputStream.writePacket(pack);
 		}
 		catch (IOException ex) {
-			kick(ex.getMessage());
+			kick(ex.getMessage(), Reason.LOST_CONNECTION);
 		}
 	}
 	

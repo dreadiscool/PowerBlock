@@ -4,6 +4,14 @@ import gg.mc.Player;
 
 public class PlayerKickEvent extends Event {
 
+	public static enum Reason {
+		BANNED,
+		SERVER_FULL,
+		WHITELIST,
+		LOST_CONNECTION,
+		PLUGIN_KICK
+	}
+	
 	private String kicker;
 	private Player player;
 	private String reason;

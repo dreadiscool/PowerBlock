@@ -1,6 +1,7 @@
 package gg.mc.network;
 
 import gg.mc.Player;
+import gg.mc.events.PlayerKickEvent.Reason;
 import gg.mc.exceptions.NoSuchPlayerException;
 import gg.mc.network.packets.Packet;
 
@@ -113,7 +114,7 @@ public class ConnectionThread extends Thread {
 		synchronized (loginQueue) {
 			if (loginQueue.remove(p)) {
 				if (clients.get(p.getUsername()) != null) {
-					clients.get(p.getUsername()).kick("You logged in from another location!");
+					clients.get(p.getUsername()).kick("You logged in from another location!", Reason.LOST_CONNECTION);
 				}
 				clients.put(p.getUsername(), p);
 				System.out.println(p.getUsername() + " has logged in");
