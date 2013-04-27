@@ -3,6 +3,7 @@ package gg.mc;
 import java.io.File;
 import java.util.Scanner;
 
+import gg.mc.events.PlayerKickEvent.Reason;
 import gg.mc.exceptions.ServerRunningException;
 import gg.mc.heartbeat.HeartbeatThread;
 import gg.mc.network.ConnectionThread;
@@ -36,20 +37,7 @@ public class PowerBlock {
 		Scanner s = new Scanner(System.in);
 		s.useDelimiter(System.getProperty("line.separator"));
 		while (s.hasNext()) {
-			String[] cmdRaw = s.next().split(" ");
-			String cmd = cmdRaw[0];
-			String[] cmdArgs = new String[cmdRaw.length - 1];
-			System.arraycopy(cmdRaw, 1, cmdArgs, 0, cmdArgs.length);
-			if (cmd.equalsIgnoreCase("stop")) {
-				if (cmdArgs.length == 0) {
-					PowerBlock.getServer().stop();
-					break;
-				}
-				else {
-					System.out.println("Command 'stop' takes no arguments. Type 'stop' to stop the server.");
-				}
-			}
-			PowerBlock.getServer().getPluginManager().callConsoleCommand(cmd, cmdArgs);
+			((ServerThread) PowerBlock.getServer().serverThread).dispatchCommand(s.next());
 		}
 		s.close();
 	}
@@ -63,7 +51,6 @@ public class PowerBlock {
 	
 	private void startServer() {
 		connectionThread.start();
-		serverThread.start();
 		try {
 			worldManager = new WorldManager();
 		}
@@ -76,9 +63,7 @@ public class PowerBlock {
 			worldManager.createWorld("world", 256, 256, 256);
 		}
 		pluginManager = new PluginManager();
-		pluginManager.load();
-		
-		// Start heartbeat thread after plugin manager to call events
+		serverThread.start();
 		heartbeatThread.start();
 	}
 	
@@ -92,6 +77,10 @@ public class PowerBlock {
 	
 	public void stop() {
 		System.out.println("Server shutting down...");
+		Player[] players = getOnlinePlayers();
+		for (int i = 0; i < players.length; i++) {
+			players[i].kick("Server is shutting down!", Reason.LOST_CONNECTION);
+		}
 		pluginManager.unload();
 		connectionThread.interrupt();
 		serverThread.interrupt();

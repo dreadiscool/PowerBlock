@@ -89,7 +89,7 @@ public class Player {
 				if (incoming instanceof Packet5UpdateBlock) {
 					Packet5UpdateBlock packet = (Packet5UpdateBlock) incoming;
 					byte b1 = PowerBlock.getServer().getWorldManager().getMainWorld().getBlockAt(packet.getXPos(), packet.getYPos(), packet.getZPos());
-					if (packet.getMode() == 0x01) { //The block was placed;
+					if (packet.getMode() == 0x01) {
 						// Event
 						BlockPlaceEvent e = new BlockPlaceEvent(this, packet.getXPos(), packet.getYPos(), packet.getZPos(), packet.getBlockType());
 						PowerBlock.getServer().getPluginManager().callEvent(e);
@@ -103,7 +103,6 @@ public class Player {
 						BlockBreakEvent e = new BlockBreakEvent(this, new Position(packet.getXPos(), packet.getYPos(), packet.getZPos(), (byte) 0, (byte) 0), b1, packet.getBlockType());
 						PowerBlock.getServer().getPluginManager().callEvent(e);
 						if (e.isCancelled()) {
-							// Can't just return, must echo back to prevent sluggish feel
 							packetOutputStream.writePacket(new Packet6SetBlock(packet.getXPos(), packet.getYPos(), packet.getZPos(), b1));
 							return;
 						}
@@ -129,7 +128,7 @@ public class Player {
 						PlayerChatEvent e = new PlayerChatEvent(this, packet.getMessage());
 						PowerBlock.getServer().getPluginManager().callEvent(e);
 						if (!e.isCancelled()) {
-							PowerBlock.getServer().broadcastMessage(e.getMessage());
+							PowerBlock.getServer().broadcastMessage(e.getFormat());
 						}
 					}
 				}
@@ -229,8 +228,6 @@ public class Player {
 		if (ev.getQuitMessage() != null) {
 			PowerBlock.getServer().broadcastMessage(ev.getQuitMessage());
 		}
-		try { throw new Exception(); }
-		catch (Exception ex) { ex.printStackTrace(); }
 	}
 	
 	/**

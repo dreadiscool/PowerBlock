@@ -112,7 +112,6 @@ public class ConnectionThread extends Thread {
 		}
 		catch (Exception ex) {
 			// Were never in, or already removed.
-			ex.printStackTrace();
 		}
 	}
 	
