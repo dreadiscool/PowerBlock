@@ -84,6 +84,16 @@ public class PluginManager {
 		Context.exit();
 	}
 	
+	public Plugin[] getAllPlugins() {
+		Collection<Plugin> plgs = plugins.values();
+		Iterator<Plugin> iter = plgs.iterator();
+		Plugin[] allPlugins = new Plugin[plgs.size()];
+		for (int i = 0; iter.hasNext(); i++) {
+			allPlugins[i] = iter.next();
+		}
+		return allPlugins;
+	}
+	
 	public Plugin getPlugin(String name) {
 		return plugins.get(name);
 	}
