@@ -114,7 +114,7 @@ public class Player {
 						for (int i = 1; i < rawStuff.length; i++) {
 							cmdArgs[i - 1] = rawStuff[i];
 						}
-						
+						PowerBlock.getServer().getPluginManager().callPlayerCommand(this, cmd, cmdArgs);
 					}
 					else {
 						StringBuilder sb = new StringBuilder();

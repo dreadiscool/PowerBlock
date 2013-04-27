@@ -1,5 +1,6 @@
 package gg.mc.plugin;
 
+import gg.mc.Player;
 import gg.mc.PowerBlock;
 import gg.mc.events.*;
 
@@ -121,6 +122,20 @@ public class Plugin {
 		catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public boolean onPlayerCommand(Player player, String command, String[] args) {
+		try {
+			Function playerCommand = (Function) scope.get("onPlayerCommand", scope);
+			Object result = playerCommand.call(pluginManager.getContext(), scope, scope, new Object[] { player, command, args });
+			return Context.toBoolean(result);
+		}
+		catch (ClassCastException ex) { }
+		catch (Exception ex) {
+			System.out.println("An error occurred handling the command '" + command + "' for the plugin " + this.getPluginName());
+			ex.printStackTrace();
+		}
+		return false;
 	}
 	
 	public String getPluginName() {
