@@ -43,7 +43,7 @@ public class PowerBlock {
 	private void startServer() {
 		connectionThread.start();
 		serverThread.start();
-		heartbeatThread.start();
+		// heartbeatThread.start();
 		try {
 			worldManager = new WorldManager();
 		}
@@ -57,6 +57,9 @@ public class PowerBlock {
 		}
 		pluginManager = new PluginManager();
 		pluginManager.load();
+		
+		// Start heartbeat thread after plugin manager to call events
+		heartbeatThread.start();
 	}
 	
 	public void broadcastMessage(String message) {

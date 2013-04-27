@@ -98,6 +98,17 @@ public class Plugin {
 		
 	}
 	
+	public void onHeartBeat(HeartbeatEvent e) {
+		try {
+			Function heartBeat = (Function) scope.get("onHeartBeat", scope);
+			heartBeat.call(pluginManager.getContext(), scope, scope, new Object[] { e });
+		}
+		catch (ClassCastException ex) { }
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
 	public String getPluginName() {
 		return name;
 	}

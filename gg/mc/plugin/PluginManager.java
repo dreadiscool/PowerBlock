@@ -35,6 +35,9 @@ public class PluginManager {
 						if (!in.startsWith("#")) {
 							script.add(in);
 						}
+						else if (in.replace('\t', ' ').trim().startsWith("//")) {
+							// Comment :o
+						}
 						else {
 							String[] params = in.split(" ");
 							if (params[params.length - 2].equals("name")) {
@@ -77,6 +80,10 @@ public class PluginManager {
 		Context.exit();
 	}
 	
+	public Plugin getPlugin(String name) {
+		return plugins.get(name);
+	}
+	
 	public void callEvent(Event event) {
 		try {
 			Collection<Plugin> plgs = plugins.values();
@@ -99,6 +106,11 @@ public class PluginManager {
 			else if (event instanceof PlayerQuitEvent) {
 				while (iter.hasNext()) {
 					iter.next().onPlayerQuit((PlayerQuitEvent) event);
+				}
+			}
+			else if (event instanceof HeartbeatEvent) {
+				while (iter.hasNext()) {
+					iter.next().onHeartBeat((HeartbeatEvent) event);
 				}
 			}
 			else {

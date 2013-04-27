@@ -1,5 +1,8 @@
 package gg.mc.heartbeat;
 
+import gg.mc.PowerBlock;
+import gg.mc.events.HeartbeatEvent;
+import gg.mc.exceptions.HeartbeatCancelledException;
 import gg.mc.network.ConnectionThread;
 
 import java.io.BufferedReader;
@@ -22,15 +25,22 @@ public class HeartbeatThread extends Thread {
 		try {
 			while (true) {
 				try {
+					// Event
+					HeartbeatEvent e = new HeartbeatEvent(25565, 100, "PowerBlock", "True", 0);
+					PowerBlock.getServer().getPluginManager().callEvent(e);
+					if (e.isCancelled()) {
+						throw new HeartbeatCancelledException();
+					}
+					
 					StringBuilder sb = new StringBuilder();
 					sb.append("https://minecraft.net/heartbeat.jsp?");
-					sb.append("port=25565");
-					sb.append("&max=9001");
-					sb.append("&name=PowerBlock");
-					sb.append("&public=True");
+					sb.append("port=" + e.getPort());
+					sb.append("&max=" + e.getMaxPlayers());
+					sb.append("&name=" + e.getName());
+					sb.append("&public=" + e.getPublicName());
 					sb.append("&version=7");
 					sb.append("&salt=" + connectionThread.getSalt());
-					sb.append("&users=8999");
+					sb.append("&users=" + e.getPlayerCount());
 					URL url = new URL(sb.toString().replace(" ", "%20"));
 					BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
 					StringBuilder respo = new StringBuilder();
@@ -47,6 +57,12 @@ public class HeartbeatThread extends Thread {
 				}
 				catch (IOException ex) {
 					System.out.println("Failed to send heartbeat to minecraft.net, is it down?");
+				}
+				catch (HeartbeatCancelledException ex) {
+					// In the future print which plugin cancelled?
+				}
+				catch (Exception ex) {
+					ex.printStackTrace();
 				}
 				Thread.sleep(15000);
 			}
