@@ -97,6 +97,7 @@ public class Player {
 						PowerBlock.getServer().getPluginManager().callEvent(e);
 						if (e.isCancelled()) {
 							packetOutputStream.writePacket(new Packet6SetBlock(packet.getXPos(), packet.getYPos(), packet.getZPos(), b1));
+							return;
 						}
 						PowerBlock.getServer().getWorldManager().getMainWorld().setBlockAt(e.getPosition(), e.getBlockPlaced());
 					}
