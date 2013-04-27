@@ -1,5 +1,8 @@
 package gg.mc;
 
+import gg.mc.network.packets.Packet;
+import gg.mc.network.packets.Packet6SetBlock;
+
 public class World {
 
 	private String name;
@@ -34,6 +37,15 @@ public class World {
 		}
 	}
 	
+	public void broadcastWorldPacket(Packet packet) {
+		Player[] players = PowerBlock.getServer().getOnlinePlayers();
+		for (int i = 0; i < players.length; i++) {
+			if (this.equals(players[i].getWorld())) {
+				players[i].push(packet);
+			}
+		}
+	}
+	
 	private int getDataPosition(short x, short y, short z) {
 		return (z * this.height + y) * this.length + x;
 	}
@@ -48,6 +60,8 @@ public class World {
 	
 	public void setBlockAt(short x, short y, short z, byte block) {
 		data[getDataPosition(x, y, z)] = block;
+		Packet6SetBlock update = new Packet6SetBlock(x, y, z, block);
+		broadcastWorldPacket(update);
 	}
 	
 	public byte getBlockAt(Position p) {

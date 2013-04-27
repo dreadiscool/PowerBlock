@@ -42,6 +42,8 @@ public class Player {
 	// In the future, just remove them. This is used to hide logged off spam.
 	private boolean disconnected = false;
 	
+	private World world;
+	
 	public Player(ConnectionThread connectionThread, Socket socket) throws IOException {
 		this.connectionThread = connectionThread;
 		this.packetInputStream = new PacketInputStream(socket.getInputStream());
@@ -106,7 +108,7 @@ public class Player {
 							packetOutputStream.writePacket(new Packet6SetBlock(packet.getXPos(), packet.getYPos(), packet.getZPos(), b1));
 							return;
 						}
-						PowerBlock.getServer().getWorldManager().getMainWorld().setBlockAt(e.getPosition(), e.getBlockBroken());
+						PowerBlock.getServer().getWorldManager().getMainWorld().setBlockAt(e.getPosition(), Block.Air);
 					}
 				}
 				else if (incoming instanceof Packet8Position) {
@@ -145,6 +147,7 @@ public class Player {
 	
 	public void sendWorld(World world) {
 		try {
+			this.world = world;
 			byte[] worldData = world.getWorldData();
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			GZIPOutputStream gos = new GZIPOutputStream(bos);
@@ -241,6 +244,10 @@ public class Player {
 		catch (IOException ex) {
 			kick(ex.getMessage(), Reason.LOST_CONNECTION);
 		}
+	}
+	
+	public World getWorld() {
+		return world;
 	}
 	
 	public String getUsername() {
