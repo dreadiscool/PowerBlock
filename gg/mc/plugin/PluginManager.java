@@ -115,6 +115,11 @@ public class PluginManager {
 					iter.next().onHeartBeat((HeartbeatEvent) event);
 				}
 			}
+			else if (event instanceof BlockBreakEvent) {
+				while (iter.hasNext()) {
+					iter.next().onBlockBreak((BlockBreakEvent) event);
+				}
+			}
 			else {
 				throw new InvalidEventException(event);
 				// In the future allow custom events maybe?

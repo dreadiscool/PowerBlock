@@ -124,6 +124,18 @@ public class Plugin {
 		}
 	}
 	
+	public void onBlockBreak(BlockBreakEvent e)
+	{
+		try {
+			Function blockBreak = (Function) scope.get("onBlockBreak", scope);
+			blockBreak.call(pluginManager.getContext(), scope, scope, new Object[] { e });
+		}
+		catch (ClassCastException ex) { }
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
 	public boolean onPlayerCommand(Player player, String command, String[] args) {
 		try {
 			Function playerCommand = (Function) scope.get("onPlayerCommand", scope);

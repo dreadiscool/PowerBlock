@@ -97,6 +97,8 @@ public class Player {
 						//Create our new event;
 						BlockBreakEvent e = new BlockBreakEvent(this, new Position(packet.getXPos(), packet.getYPos(), packet.getZPos(), (byte)0, (byte)0), b1, packet.getBlockType());
 						PowerBlock.getServer().getPluginManager().callEvent(e);
+						if(e.getOldBlock() != Block.Air)
+							e.setCancelled(true);
 						if(e.isCancelled())
 							return;
 						PowerBlock.getServer().getWorldManager().getMainWorld().setBlockAt(e.getPosition(), e.getNewBlock());
