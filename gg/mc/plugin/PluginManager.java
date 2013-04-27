@@ -1,5 +1,7 @@
 package gg.mc.plugin;
 
+import gg.mc.ChatColor;
+import gg.mc.Player;
 import gg.mc.events.*;
 import gg.mc.exceptions.InvalidEventException;
 import gg.mc.exceptions.InvalidPluginException;
@@ -123,6 +125,25 @@ public class PluginManager {
 		}
 		catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	public void callPlayerCommand(Player player, String command, String[] args) {
+		boolean handled = false;
+		try {
+			Collection<Plugin> plgs = plugins.values();
+			Iterator<Plugin> iter = plgs.iterator();
+			while (iter.hasNext()) {
+				if (iter.next().onPlayerCommand(player, command, args)) {
+					handled = true;
+				}
+			}
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		if (!handled) {
+			player.sendMessage(ChatColor.WHITE + "Unknown command. Type /help for help.");
 		}
 	}
 	
