@@ -15,7 +15,11 @@ public class Packet13Message extends Packet {
 	}
 	
 	public Packet13Message(String message) {
-		this(Packet.getBytes(message));
+		super((byte) 0x0d);
+		byte[] msg = Packet.getBytes(message);
+		this.payload = new byte[msg.length + 1];
+		this.payload[0] = (byte) 0x00;
+		System.arraycopy(msg, 0, this.payload, 1, msg.length);
 		this.message = message;
 	}
 	

@@ -125,12 +125,6 @@ public class Player {
 						PowerBlock.getServer().getPluginManager().callPlayerCommand(this, cmd, cmdArgs);
 					}
 					else {
-						StringBuilder sb = new StringBuilder();
-						sb.append("<");
-						sb.append(this.getUsername());
-						sb.append("> ");
-						sb.append(((Packet13Message) incoming).getMessage());
-						
 						// Event
 						PlayerChatEvent e = new PlayerChatEvent(this, packet.getMessage());
 						PowerBlock.getServer().getPluginManager().callEvent(e);
@@ -219,11 +213,6 @@ public class Player {
 				e.setReason("You were kicked from the server!");
 			}
 			message = e.getReason();
-		}else {
-			//If player is disconnected, call the PlayerQuitEvent, and allow for plugin management to set the quit message.
-			PlayerQuitEvent ev = new PlayerQuitEvent(this);
-			PowerBlock.getServer().getPluginManager().callEvent(ev);
-			PowerBlock.getServer().broadcastMessage(ev.getQuitMessage());
 		}
 		try {
 			packetOutputStream.writePacket(new Packet14Disconnect(message));
@@ -232,8 +221,16 @@ public class Player {
 			// Well hell, they were getting kicked anyway
 		}
 		connectionThread.removePlayer(this);
-		System.out.println("removed player");
 		disconnected = true;
+		
+		// Event
+		PlayerQuitEvent ev = new PlayerQuitEvent(this);
+		PowerBlock.getServer().getPluginManager().callEvent(ev);
+		if (ev.getQuitMessage() != null) {
+			PowerBlock.getServer().broadcastMessage(ev.getQuitMessage());
+		}
+		try { throw new Exception(); }
+		catch (Exception ex) { ex.printStackTrace(); }
 	}
 	
 	/**
