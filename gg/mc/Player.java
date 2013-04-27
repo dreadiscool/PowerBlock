@@ -166,10 +166,10 @@ public class Player {
 				System.out.println("[" + getInetAddress() + "] lost connection to the server");
 			}
 		}
-		PlayerKickEvent e = new PlayerKickEvent("Server" , this, message);
+		PlayerKickEvent e = new PlayerKickEvent("Server", this, message);
 		PowerBlock.getServer().getPluginManager().callEvent(e);
-		if (e.getReason() != null) {
-			PowerBlock.getServer().broadcastMessage(e.getPlayer().getUsername() + " was kicked for " + e.getReason());
+		if (e.getReason() == null) {
+			e.setReason("You were kicked from the server!");
 		}
 		try {
 			packetOutputStream.writePacket(new Packet14Disconnect(e.getReason()));

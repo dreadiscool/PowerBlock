@@ -25,4 +25,8 @@ public class PlayerKickEvent extends Event {
 	public String getReason() {
 		return reason;
 	}
+	
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
 }
