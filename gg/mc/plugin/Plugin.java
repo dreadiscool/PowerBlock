@@ -91,11 +91,25 @@ public class Plugin {
 	}
 	
 	public void onPlayerKick(PlayerKickEvent e) {
-		
+		try {
+			Function playerKick = (Function) scope.get("onPlayerKick", scope);
+			playerKick.call(pluginManager.getContext(), scope, scope, new Object[] { e });
+		}
+		catch (ClassCastException ex) { }
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	public void onPlayerChat(PlayerChatEvent e) {
-		
+		try {
+			Function playerChat = (Function) scope.get("onPlayerChat", scope);
+			playerChat.call(pluginManager.getContext(), scope, scope, new Object[] { e });
+		}
+		catch (ClassCastException ex) { }
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	public void onHeartBeat(HeartbeatEvent e) {

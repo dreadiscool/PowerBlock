@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.util.zip.GZIPOutputStream;
 
+import gg.mc.events.PlayerChatEvent;
 import gg.mc.events.PlayerKickEvent;
 import gg.mc.events.PlayerKickEvent.Reason;
 import gg.mc.events.PlayerLoginEvent;
@@ -90,12 +91,30 @@ public class Player {
 					
 				}
 				else if (incoming instanceof Packet13Message) {
-					StringBuilder sb = new StringBuilder();
-					sb.append("<");
-					sb.append(this.getUsername());
-					sb.append("> ");
-					sb.append(((Packet13Message) incoming).getMessage());
-					PowerBlock.getServer().broadcastMessage(sb.toString());
+					Packet13Message packet = (Packet13Message) incoming;
+					if (packet.getMessage().startsWith("/")) {
+						String[] rawStuff = packet.getMessage().substring(1).split(" ");
+						String cmd = rawStuff[0];
+						String[] cmdArgs = new String[rawStuff.length - 1];
+						for (int i = 1; i < rawStuff.length; i++) {
+							cmdArgs[i - 1] = rawStuff[i];
+						}
+						
+					}
+					else {
+						StringBuilder sb = new StringBuilder();
+						sb.append("<");
+						sb.append(this.getUsername());
+						sb.append("> ");
+						sb.append(((Packet13Message) incoming).getMessage());
+						
+						// Event
+						PlayerChatEvent e = new PlayerChatEvent(this, packet.getMessage());
+						PowerBlock.getServer().getPluginManager().callEvent(e);
+						if (!e.isCancelled()) {
+							PowerBlock.getServer().broadcastMessage(e.getMessage());
+						}
+					}
 				}
 				else if (incoming instanceof PacketGWomClient) {
 					kick("Cheater cheater pumpkin eater... No WOM!", Reason.PLUGIN_KICK);
