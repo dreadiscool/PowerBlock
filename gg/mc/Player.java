@@ -67,6 +67,7 @@ public class Player {
 						Configuration config = PowerBlock.getServer().getConfiguration();
 						packetOutputStream.writePacket(new Packet0Identification((byte) 7, config.getServerName(), config.getMotd(), (byte) 0x00));
 						connectionThread.addPlayer(this);
+						sendWorld(PowerBlock.getServer().getWorldManager().getMainWorld());
 						
 						// Event
 						PlayerLoginEvent e = new PlayerLoginEvent(this);
@@ -74,9 +75,6 @@ public class Player {
 						if (e.getJoinMessage() != null) {
 							PowerBlock.getServer().broadcastMessage(e.getJoinMessage());
 						}
-						
-						
-						sendWorld(PowerBlock.getServer().getWorldManager().getMainWorld());
 					}
 					else {
 						kick("Failed to verify username!", Reason.LOST_CONNECTION);
@@ -234,6 +232,7 @@ public class Player {
 			// Well hell, they were getting kicked anyway
 		}
 		connectionThread.removePlayer(this);
+		System.out.println("removed player");
 		disconnected = true;
 	}
 	
