@@ -115,6 +115,7 @@ public class PluginManager {
 			}
 			else {
 				throw new InvalidEventException(event);
+				// In the future allow custom events maybe?
 			}
 		}
 		catch (Exception ex) {
