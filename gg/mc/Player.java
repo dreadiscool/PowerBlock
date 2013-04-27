@@ -11,6 +11,7 @@ import java.util.zip.GZIPOutputStream;
 import gg.mc.events.PlayerKickEvent;
 import gg.mc.events.PlayerKickEvent.Reason;
 import gg.mc.events.PlayerLoginEvent;
+import gg.mc.events.PlayerQuitEvent;
 import gg.mc.network.ConnectionThread;
 import gg.mc.network.PacketInputStream;
 import gg.mc.network.PacketOutputStream;
@@ -177,6 +178,11 @@ public class Player {
 				e.setReason("You were kicked from the server!");
 			}
 			message = e.getReason();
+		}else {
+			//If player is disconnected, call the PlayerQuitEvent, and allow for plugin management to set the quit message.
+			PlayerQuitEvent ev = new PlayerQuitEvent(this);
+			PowerBlock.getServer().getPluginManager().callEvent(ev);
+			PowerBlock.getServer().broadcastMessage(ev.getQuitMessage());
 		}
 		try {
 			packetOutputStream.writePacket(new Packet14Disconnect(message));
