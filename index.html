@@ -42,11 +42,6 @@
 
 <p>PowerBlock is a server written from scratch for Minecraft classic. What sets it apart from other software its huge versatility. Thanks to the Rhino scripting engine, anyone can create scripts, or plugins, for PowerBlock in Notepad! No complicated IDE setup required! Written in Java, PowerBlock can be run on ANY Operating System, unlike other software which requires Mono, and other heavy, sluggish frameworks.</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
 <h3>Downloading PowerBlock</h3>
 
 <p>The latest compiled version of PowerBlock is <a href="https://dl.dropboxusercontent.com/u/29419562/PowerBlock.jar">available here</a>. You must create a startup file for your server, depending on what Operating System you use.</p>
@@ -113,7 +108,76 @@ function onPlayerJoin(e) {
 
 <h3>Scripting in PowerBlock (advanced)</h3>
 
-<p><em>Coming Soon</em></p>
+<p>There isn't much documentation on advanced scripting for PowerBlock. However, as time goes on, that will change. Here is an example script to add the 'reload' command in the console, and the '/plugins' command in-game.</p>
+
+<pre><code># name Reloader
+# author dreadiscool
+# version 1.0
+
+var BROADCAST_RELOAD = true;
+var ALLOW_LIST_PLUGINS_IN_GAME = true;
+
+function onEnable() {
+    String.prototype.equals = function(s) {
+        return this.toUpperCase() == s.toUpperCase();
+    }
+}
+
+function onConsoleCommand(command, args) {
+    if (command.equals('reload')) {
+        console.println('Reloading...');
+        if (BROADCAST_RELOAD) {
+            $.broadcastMessage('&amp;2The server is reloading, expect lag!');
+        }
+        var start = java.lang.System.currentTimeMillis();
+        $.getPluginManager().unload();
+        $.getPluginManager().load();
+        var time = java.lang.System.currentTimeMillis() - start;
+        console.println('Done reloading! [' + time + 'ms]');
+        if (BROADCAST_RELOAD) {
+            $.broadcastMessage('&amp;2Finished reloading, moving on!');
+        }
+        return true;
+    }
+    else if (command.equals('plugins')) {
+        var plugins = getPluginList();
+        console.println(plugins);
+        return true;
+    }
+    return false;
+}
+
+function onPlayerCommand(player, command, args) {
+    if (command.equals('plugins')) {
+        if (!ALLOW_LIST_PLUGINS_IN_GAME) {
+            player.sendMessage('&amp;cThe server administrator has blocked this command!');
+            return true;
+        }
+        if (args.length == 0) {
+            player.sendMessage(getPluginList());
+        }
+        else {
+            player.sendMessage('&amp;bUse the command like this: /plugins');
+        }
+        return true;
+    }
+    return false;
+}
+
+function getPluginList() {
+    var plugins = $.getPluginManager().getAllPlugins();
+    var sb = new java.lang.StringBuilder();
+    sb.append('Running Scripts [' + plugins.length + '] ');
+    for (var i = 0; i &lt; plugins.length; i++) {
+        sb.append(plugins[i].getPluginName() + ', ');
+    }
+    if (plugins.length == 0) {
+        sb.append('This server is not running any plugins :-(  ');
+    }
+    sb.setLength(sb.length() - 2);
+    return sb.toString();
+}
+</code></pre>
       </section>
 
     </div>
