@@ -65,7 +65,53 @@ Linux -&gt; start.sh
 
 <p>Congratulations! You have set up your first PowerBlock server!</p>
 
-<h3>Scripting in PowerBlock</h3>
+<h3>Scripting in PowerBlock (Basic)</h3>
+
+<p>PowerBlock's most powerful feature is you! With its JavaScript engine, PowerBlock can understand instructions from the most important person - you. Developers who have an advanced knowledge of code will also be entertained: the engine allows the manipulation and creation of Java objects! Let's get started</p>
+
+<p>All scripts have the .js file extension (for JavaScript). Create a new file, and end it with .js. In our example, we named it TestPlugin.js</p>
+
+<p>Here is an example of an extremely basic script. Upon enabling, the line '[TestPlugin] Hello, world', will be printed to the console.</p>
+
+<pre><code># name TestPlugin
+# author dreadiscool
+# version 1.0
+
+function onEnable() {
+    console.println('Hello, world!');
+}
+</code></pre>
+
+<p>Printing messages is all well said and done, but for our script to be useful, we need to hook into some events.</p>
+
+<pre><code># name TestPlugin
+# author dreadiscool
+# version 1.0
+
+function onEnable() {
+    console.println('Hello, world!');
+}
+
+// The e represents the Event object
+function onPlayerJoin(e) {
+    e.setJoinMessage('A player has joined!');
+    console.println(e.getPlayer().getUsername() + ' has connected to the server!');
+}
+</code></pre>
+
+<p>Now that we have a (somewhat) useful plugin, we want to let the entire server know about it! So let's tell them!</p>
+
+<p><em>Previous startup code left out for brevity</em></p>
+
+<pre><code>function onPlayerCommand(player, command, args) {
+    if (command == 'shout') {
+        $.broadcastMessage('Hey everybody, ' + player.getUsername() + ' shouted!');
+        return true;
+    }
+}
+</code></pre>
+
+<h3>Scripting in PowerBlock (advanced)</h3>
 
 <p><em>Coming Soon</em></p>
       </section>
