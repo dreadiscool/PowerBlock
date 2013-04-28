@@ -1,6 +1,7 @@
 package gg.mc.network;
 
 import gg.mc.Player;
+import gg.mc.PowerBlock;
 import gg.mc.events.PlayerKickEvent.Reason;
 import gg.mc.exceptions.NoSuchPlayerException;
 import gg.mc.network.packets.Packet;
@@ -24,8 +25,12 @@ public class ConnectionThread extends Thread {
 	
 	public ConnectionThread() {
 		super("PowerBlock Connection Thread");
+	}
+	
+	@Override
+	public void run() {
 		try {
-			serverSocket = new ServerSocket(25565);
+			serverSocket = new ServerSocket(PowerBlock.getServer().getConfiguration().getServerPort());
 			String alphabet = "abcdefghijklmnopqrstuvwxyz";
 			Random random = new Random();
 			StringBuilder sb = new StringBuilder();
@@ -37,11 +42,8 @@ public class ConnectionThread extends Thread {
 		catch (Exception ex) {
 			ex.printStackTrace();
 			System.out.println("Failed to bind to port 25565 - Is it available?");
+			return;
 		}
-	}
-	
-	@Override
-	public void run() {
 		try {
 			while (true) {
 				Thread.sleep(1);

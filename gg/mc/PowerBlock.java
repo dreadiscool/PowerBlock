@@ -42,10 +42,10 @@ public class PowerBlock {
 		s.close();
 	}
 	
+	private Configuration configuration = new Configuration();
 	private Thread connectionThread = new ConnectionThread();
 	private Thread serverThread = new ServerThread((ConnectionThread) connectionThread);
 	private Thread heartbeatThread = new HeartbeatThread((ConnectionThread) connectionThread);
-	private Configuration configuration = new Configuration();
 	private WorldManager worldManager;
 	private PluginManager pluginManager;
 	private Scheduler scheduler;
@@ -88,6 +88,7 @@ public class PowerBlock {
 		connectionThread.interrupt();
 		serverThread.interrupt();
 		heartbeatThread.interrupt();
+		System.out.println("Server stopped!");
 		System.exit(0);
 	}
 	

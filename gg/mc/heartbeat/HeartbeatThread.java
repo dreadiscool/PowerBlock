@@ -1,5 +1,6 @@
 package gg.mc.heartbeat;
 
+import gg.mc.Configuration;
 import gg.mc.PowerBlock;
 import gg.mc.events.HeartbeatEvent;
 import gg.mc.exceptions.HeartbeatCancelledException;
@@ -26,7 +27,8 @@ public class HeartbeatThread extends Thread {
 			while (true) {
 				try {
 					// Event
-					HeartbeatEvent e = new HeartbeatEvent(25565, 100, "PowerBlock", "True", 0);
+					Configuration c = PowerBlock.getServer().getConfiguration();
+					HeartbeatEvent e = new HeartbeatEvent(c.getServerPort(), c.getMaxPlayers(), c.getServerName(), "True", 0);
 					PowerBlock.getServer().getPluginManager().callEvent(e);
 					if (e.isCancelled()) {
 						throw new HeartbeatCancelledException();
