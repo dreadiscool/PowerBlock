@@ -1,6 +1,8 @@
 package gg.mc;
 
+import gg.mc.exceptions.NoAvailableEIDException;
 import gg.mc.network.packets.Packet;
+import gg.mc.network.packets.Packet12DespawnPlayer;
 import gg.mc.network.packets.Packet6SetBlock;
 
 public class World {
@@ -10,6 +12,7 @@ public class World {
 	private short depth;
 	private short height;
 	private byte[] data;
+	private boolean[] availableEids = new boolean[256];
 	
 	public World(String name, short length, short depth, short height) {
 		if (length < 32) {
@@ -29,21 +32,22 @@ public class World {
 		for (int i = 0; i < data.length; i++) {
 			data[i] = 0;
 		}
-		/*for (int z = 0; z < depth; z++) {
-			for (int x = 0; x < length; x++) {
-				data[getDataPosition((short) x, (short) 1, (short) z)] = Block.Dirt;
-				data[getDataPosition((short) x, (short) 2, (short) z)] = Block.Grass;
-			}
-		}*/
 		for (int i = 0; i < (length * depth * height * 0.5); i++) {
 			data[i] = Block.Grass;
+		}
+		for (int i = 0; i < availableEids.length; i++) {
+			availableEids[i] = true;
 		}
 	}
 	
 	public void broadcastWorldPacket(Packet packet) {
+		broadcastWorldPacket(packet, null);
+	}
+	
+	public void broadcastWorldPacket(Packet packet, Player exclude) {
 		Player[] players = PowerBlock.getServer().getOnlinePlayers();
 		for (int i = 0; i < players.length; i++) {
-			if (this.equals(players[i].getWorld())) {
+			if (players[i] != exclude && this.equals(players[i].getWorld())) {
 				players[i].push(packet);
 			}
 		}
@@ -51,6 +55,21 @@ public class World {
 	
 	private int getDataPosition(short x, short y, short z) {
 		return y * (length * depth) + (z * length) + x;
+	}
+	
+	public byte requestEntityId() throws NoAvailableEIDException {
+		for (int i = 0; i < availableEids.length; i++) {
+			if (availableEids[i]) {
+				availableEids[i] = false;
+				return (byte) i;
+			}
+		}
+		throw new NoAvailableEIDException(this);
+	}
+	
+	public void reclaimEid(byte id) {
+		broadcastWorldPacket(new Packet12DespawnPlayer(id));
+		availableEids[(int) id] = true;
 	}
 	
 	public byte getBlockAt(short x, short y, short z) {

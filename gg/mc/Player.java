@@ -28,6 +28,7 @@ import gg.mc.network.packets.Packet3Chunk;
 import gg.mc.network.packets.Packet4Finalize;
 import gg.mc.network.packets.Packet5UpdateBlock;
 import gg.mc.network.packets.Packet6SetBlock;
+import gg.mc.network.packets.Packet7SpawnPlayer;
 import gg.mc.network.packets.Packet8Position;
 import gg.mc.network.packets.PacketGWomClient;
 
@@ -43,6 +44,7 @@ public class Player {
 	// In the future, just remove them. This is used to hide logged off spam.
 	private boolean disconnected = false;
 	
+	private byte entityId;
 	private World world;
 	private Position position = new Position(0, 0, 0, (byte) 0, (byte) 0);
 	
@@ -126,6 +128,7 @@ public class Player {
 					}
 					// Update pos to all
 					this.position = new Position(packet.getXPos(), packet.getYPos(), packet.getZPos(), packet.getYaw(), packet.getPitch());
+					world.broadcastWorldPacket(new Packet8Position(entityId, position.getX(), position.getY(), position.getZ(), position.getYaw(), position.getPitch()), this);
 				}
 				else if (incoming instanceof Packet13Message) {
 					Packet13Message packet = (Packet13Message) incoming;
@@ -160,7 +163,9 @@ public class Player {
 	
 	public void sendWorld(World world) {
 		try {
-			this.world = world;
+			if (this.world != null) {
+				world.reclaimEid(entityId);
+			}
 			byte[] worldData = world.getWorldData();
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			GZIPOutputStream gos = new GZIPOutputStream(bos);
@@ -187,9 +192,12 @@ public class Player {
 				position += length;
 			}
 			
-			// Removed packet 7 spawn was screwing stuff up
 			packetOutputStream.writePacket(new Packet4Finalize(world.getLength(), world.getHeight(), world.getDepth()));
 			packetOutputStream.writePacket(new Packet8Position((byte) -1, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
+			
+			this.entityId = world.requestEntityId();
+			world.broadcastWorldPacket(new Packet7SpawnPlayer(entityId, getUsername(), (byte) 50, (byte) 50, (byte) 50, (byte) 0, (byte) 0));
+			this.world = world;
 		}
 		catch (Exception ex) {
 			kick(ex.getMessage(), Reason.LOST_CONNECTION);
@@ -244,6 +252,10 @@ public class Player {
 		if (ev.getQuitMessage() != null) {
 			PowerBlock.getServer().broadcastMessage(ev.getQuitMessage());
 		}
+		
+		if (world != null) {
+			world.reclaimEid(entityId);
+		}
 	}
 	
 	/**
@@ -269,6 +281,10 @@ public class Player {
 	
 	public String getInetAddress() {
 		return inetAddress;
+	}
+	
+	public byte getEntityId() {
+		return entityId;
 	}
 	
 	public Position getPosition() {
