@@ -31,6 +31,13 @@ public class ServerThread extends Thread {
 					}
 				}
 				
+				// Scheduler
+				ArrayList<Task> tasks = PowerBlock.getServer().getScheduler().checkFunctions();
+				for (int i = 0; i < tasks.size(); i++) {
+					Task t = tasks.get(i);
+					t.getPlugin().callFunction(t.getFunctionName());
+				}
+				
 				// Console commands. Do it here to keep all script calls on same thread
 				synchronized (consoleCommandsLeft) {
 					for (int i = 0; i < consoleCommandsLeft.size(); i++) {

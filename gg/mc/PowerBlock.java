@@ -48,6 +48,7 @@ public class PowerBlock {
 	private Configuration configuration = new Configuration();
 	private WorldManager worldManager;
 	private PluginManager pluginManager;
+	private Scheduler scheduler;
 	
 	private void startServer() {
 		connectionThread.start();
@@ -63,6 +64,7 @@ public class PowerBlock {
 			worldManager.createWorld("world", 64, 64, 64);
 		}
 		pluginManager = new PluginManager();
+		scheduler = new Scheduler();
 		serverThread.start();
 		heartbeatThread.start();
 	}
@@ -106,5 +108,9 @@ public class PowerBlock {
 	
 	public PluginManager getPluginManager() {
 		return pluginManager;
+	}
+	
+	public Scheduler getScheduler() {
+		return scheduler;
 	}
 }

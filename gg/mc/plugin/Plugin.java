@@ -223,6 +223,21 @@ public class Plugin {
 		return false;
 	}
 	
+	public void callFunction(String function) {
+		try {
+			Function func = (Function) scope.get(function, scope);
+			func.call(pluginManager.getContext(), scope, scope, new Object[] { });
+		}
+		catch (EvaluatorException ex) {
+			System.out.println("Scheduler generated an evaluation error for plugin '" + getPluginName() + "'!");
+			System.out.println("[" + this.getPluginName() + "] Error in script, line " + ex.lineNumber());
+		}
+		catch (Exception ex) {
+			System.out.println("Scheduler generated an exception for plugin '" + getPluginName() + "'!");
+			ex.printStackTrace();
+		}
+	}
+	
 	public String getPluginName() {
 		return name;
 	}
