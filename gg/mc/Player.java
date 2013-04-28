@@ -193,10 +193,11 @@ public class Player {
 			}
 			
 			packetOutputStream.writePacket(new Packet4Finalize(world.getLength(), world.getHeight(), world.getDepth()));
-			packetOutputStream.writePacket(new Packet8Position((byte) -1, (short) 50, (short) 50, (short) 50, (byte) 25, (byte) 25));
+			Position spawn = world.getSpawn();
+			packetOutputStream.writePacket(new Packet8Position((byte) -1, spawn.getX(), spawn.getY(), spawn.getZ(), spawn.getYaw(), spawn.getPitch()));
 			
 			this.entityId = world.requestEntityId();
-			world.broadcastWorldPacket(new Packet7SpawnPlayer(entityId, getUsername(), (byte) 50, (byte) 50, (byte) 50, (byte) 0, (byte) 0));
+			world.broadcastWorldPacket(new Packet7SpawnPlayer(entityId, getUsername(), spawn.getX(), spawn.getY(), spawn.getZ(), spawn.getYaw(), spawn.getPitch()));
 			Player[] players = PowerBlock.getServer().getOnlinePlayers();
 			for (int i = 0; i < players.length; i++) {
 				if (players[i].getWorld() == world) {
@@ -205,6 +206,7 @@ public class Player {
 				}
 			}
 			this.world = world;
+			this.position = spawn;
 		}
 		catch (Exception ex) {
 			kick(ex.getMessage(), Reason.LOST_CONNECTION);

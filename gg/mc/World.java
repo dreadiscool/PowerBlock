@@ -13,6 +13,7 @@ public class World {
 	private short height;
 	private byte[] data;
 	private boolean[] availableEids = new boolean[256];
+	private Position spawn;
 	
 	public World(String name, short length, short depth, short height) {
 		if (length < 32) {
@@ -38,6 +39,7 @@ public class World {
 		for (int i = 0; i < availableEids.length; i++) {
 			availableEids[i] = true;
 		}
+		spawn = new Position(length / 2, (height / 2) + 3, depth / 2, (byte) 0, (byte) 0);
 	}
 	
 	public void broadcastWorldPacket(Packet packet) {
@@ -112,5 +114,13 @@ public class World {
 	
 	public byte[] getWorldData() {
 		return data;
+	}
+	
+	public Position getSpawn() {
+		return spawn;
+	}
+	
+	public void setSpawn(Position p) {
+		spawn = p;
 	}
 }
