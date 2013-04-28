@@ -4,6 +4,8 @@ import gg.mc.exceptions.NoSuchWorldException;
 import gg.mc.exceptions.ServerRunningException;
 import gg.mc.exceptions.WorldExistsException;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WorldManager {
@@ -39,9 +41,22 @@ public class WorldManager {
 		if (worlds.get(name) != null) {
 			throw new WorldExistsException(name);
 		}
+		if (World.exists(name)) {
+			System.out.println("World '" + name + "' already exists in hard drive, loading that instead!");
+			worlds.put(name, new World(name));
+			return;
+		}
 		PowerBlock.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "World generation beginning!");
 		worlds.put(name, new World(name, length, depth, height));
 		PowerBlock.getServer().broadcastMessage(ChatColor.DARK_PURPLE + "World generation finished");
+	}
+	
+	public void saveAllWorlds() {
+		Collection<World> w = worlds.values();
+		Iterator<World> iter = w.iterator();
+		while (iter.hasNext()) {
+			iter.next().save();
+		}
 	}
 	
 	public World getMainWorld() {

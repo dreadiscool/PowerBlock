@@ -84,6 +84,7 @@ public class PowerBlock {
 			players[i].kick("Server is shutting down!", Reason.LOST_CONNECTION);
 		}
 		pluginManager.unload();
+		worldManager.saveAllWorlds();
 		connectionThread.interrupt();
 		serverThread.interrupt();
 		heartbeatThread.interrupt();

@@ -1,5 +1,11 @@
 package gg.mc;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 import gg.mc.exceptions.NoAvailableEIDException;
 import gg.mc.network.packets.Packet;
 import gg.mc.network.packets.Packet12DespawnPlayer;
@@ -7,6 +13,15 @@ import gg.mc.network.packets.Packet6SetBlock;
 
 public class World {
 
+	/**
+	 * Checks if the world exists in the file already
+	 * @param name
+	 * @return
+	 */
+	public static boolean exists(String name) {
+		return new File(System.getProperty("user.dir") + File.separator + "worlds" + File.separator + name + ".world").exists();
+	}
+	
 	private String name;
 	private short length;
 	private short depth;
@@ -40,6 +55,55 @@ public class World {
 			availableEids[i] = true;
 		}
 		spawn = new Position(length / 2, (height / 2) + 3, depth / 2, (byte) 0, (byte) 0);
+	}
+	
+	public World(String name) {
+		this.name = name;
+		load();
+	}
+	
+	public void load() {
+		File file = new File(System.getProperty("user.dir") + File.separator + "worlds" + File.separator + name + ".world");
+		try {
+			DataInputStream dis = new DataInputStream(new FileInputStream(file));
+			length = dis.readShort();
+			depth = dis.readShort();
+			height = dis.readShort();
+			short x = dis.readShort();
+			short y = dis.readShort();
+			short z = dis.readShort();
+			byte yaw = dis.readByte();
+			byte pitch = dis.readByte();
+			spawn = new Position(x, y, z, yaw, pitch);
+			data = new byte[length * depth * height];
+			dis.read(data);
+			dis.close();
+		}
+		catch (Exception ex) {
+			System.out.println("Failed to load map '" + name + "'!");
+		}
+	}
+	
+	public void save() {
+		File file = new File(System.getProperty("user.dir") + File.separator + "worlds" + File.separator + name + ".world");
+		try {
+			DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+			dos.writeShort(length);
+			dos.writeShort(depth);
+			dos.writeShort(height);
+			dos.writeShort(spawn.getX());
+			dos.writeShort(spawn.getY());
+			dos.writeShort(spawn.getZ());
+			dos.writeByte(spawn.getYaw());
+			dos.writeByte(spawn.getPitch());
+			dos.write(data);
+			dos.flush();
+			dos.close();
+		}
+		catch (Exception ex) {
+			System.out.println("Failed to save map '" + name + "'!");
+			ex.printStackTrace();
+		}
 	}
 	
 	public void broadcastWorldPacket(Packet packet) {
