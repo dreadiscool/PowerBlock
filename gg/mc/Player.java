@@ -248,8 +248,8 @@ public class Player {
 		catch (Exception ex) {
 			// Well hell, they were getting kicked anyway
 		}
-		
-		if (loggedIn && !disconnected) {
+		disconnected = true;
+		if (loggedIn) {
 			// Event
 			PlayerQuitEvent ev = new PlayerQuitEvent(this);
 			PowerBlock.getServer().getPluginManager().callEvent(ev);
@@ -259,7 +259,6 @@ public class Player {
 		}
 		
 		connectionThread.removePlayer(this);
-		disconnected = true;
 		
 		if (world != null) {
 			world.reclaimEid(entityId);
