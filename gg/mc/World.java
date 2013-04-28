@@ -59,6 +59,9 @@ public class World {
 	
 	public World(String name) {
 		this.name = name;
+		for (int i = 0; i < availableEids.length; i++) {
+			availableEids[i] = true;
+		}
 		load();
 	}
 	

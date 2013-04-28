@@ -156,7 +156,6 @@ public class Player {
 			}
 		}
 		catch (Exception ex) {
-			ex.printStackTrace();
 			kick(ex.getMessage(), Reason.LOST_CONNECTION);
 		}
 	}
