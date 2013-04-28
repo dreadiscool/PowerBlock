@@ -68,7 +68,7 @@ public class Player {
 					md5.update(token);
 					String verificationToken = new BigInteger(1, md5.digest()).toString(16);
 					if (verificationToken.equals(ident.getVerificationKey())) {
-						username = ident.getUsername();
+						username = ident.getUsername().trim();
 						loggedIn = true;
 						Configuration config = PowerBlock.getServer().getConfiguration();
 						packetOutputStream.writePacket(new Packet0Identification((byte) 7, config.getServerName(), config.getMotd(), (byte) 0x00));
