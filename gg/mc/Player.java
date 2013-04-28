@@ -197,6 +197,13 @@ public class Player {
 			
 			this.entityId = world.requestEntityId();
 			world.broadcastWorldPacket(new Packet7SpawnPlayer(entityId, getUsername(), (byte) 50, (byte) 50, (byte) 50, (byte) 0, (byte) 0));
+			Player[] players = PowerBlock.getServer().getOnlinePlayers();
+			for (int i = 0; i < players.length; i++) {
+				if (players[i].getWorld() == world) {
+					Position p = players[i].getPosition();
+					packetOutputStream.writePacket(new Packet7SpawnPlayer(players[i].getEntityId(), players[i].getUsername(), p.getX(), p.getY(), p.getZ(), p.getYaw(), p.getPitch()));
+				}
+			}
 			this.world = world;
 		}
 		catch (Exception ex) {
