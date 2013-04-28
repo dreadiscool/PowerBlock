@@ -60,7 +60,7 @@ public class PowerBlock {
 		}
 		if (worldManager.getTotalWorlds() == 0) {
 			System.out.println("Generating default world...");
-			worldManager.createWorld("world", 256, 256, 256);
+			worldManager.createWorld("world", 64, 64, 64);
 		}
 		pluginManager = new PluginManager();
 		serverThread.start();

@@ -9,9 +9,9 @@ public class Packet6SetBlock extends Packet {
 		byte[] xpos = Packet.getBytes(x);
 		byte[] ypos = Packet.getBytes(y);
 		byte[] zpos = Packet.getBytes(z);
-		System.arraycopy(xpos, 0, this.payload, 0, 2);
-		System.arraycopy(ypos, 0, this.payload, 2, 4);
-		System.arraycopy(zpos, 0, this.payload, 4, 6);
+		System.arraycopy(xpos, 0, this.payload, 0, xpos.length);
+		System.arraycopy(ypos, 0, this.payload, 2, ypos.length);
+		System.arraycopy(zpos, 0, this.payload, 4, zpos.length);
 		this.payload[6] = block;
 	}
 }

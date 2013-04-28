@@ -29,11 +29,14 @@ public class World {
 		for (int i = 0; i < data.length; i++) {
 			data[i] = 0;
 		}
-		for (int z = 0; z < depth; z++) {
+		/*for (int z = 0; z < depth; z++) {
 			for (int x = 0; x < length; x++) {
-				setBlockAt(x, 1, z, Block.Dirt);
-				setBlockAt(x, 2, z, Block.Grass);
+				data[getDataPosition((short) x, (short) 1, (short) z)] = Block.Dirt;
+				data[getDataPosition((short) x, (short) 2, (short) z)] = Block.Grass;
 			}
+		}*/
+		for (int i = 0; i < (length * depth * height * 0.5); i++) {
+			data[i] = Block.Grass;
 		}
 	}
 	
@@ -47,7 +50,7 @@ public class World {
 	}
 	
 	private int getDataPosition(short x, short y, short z) {
-		return (z * this.height + y) * this.length + x;
+		return y * (length * depth) + (z * length) + x;
 	}
 	
 	public byte getBlockAt(short x, short y, short z) {

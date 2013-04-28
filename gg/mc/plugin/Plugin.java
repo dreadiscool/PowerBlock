@@ -175,6 +175,20 @@ public class Plugin {
 		}
 	}
 	
+	public void onPlayerMove(PlayerMoveEvent e) {
+		try {
+			Function playerMove = (Function) scope.get("onPlayerMove", scope);
+			playerMove.call(pluginManager.getContext(), scope, scope, new Object[] { e });
+		}
+		catch (EvaluatorException ex) {
+			System.out.println("[" + this.getPluginName() + "] Error in script, line " + (ex.lineNumber() + 3));
+		}
+		catch (ClassCastException ex) { }
+		catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
 	public boolean onPlayerCommand(Player player, String command, String[] args) {
 		try {
 			Function playerCommand = (Function) scope.get("onPlayerCommand", scope);

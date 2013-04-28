@@ -16,6 +16,10 @@ public class Position {
 		this.pitch = pitch;
 	}
 	
+	public Position(int x, int y, int z, byte yaw, byte pitch) {
+		this((short) x, (short) y, (short) z, yaw, pitch);
+	}
+	
 	public void add(short x, short y, short z) {
 		posX += x;
 		posY += y;

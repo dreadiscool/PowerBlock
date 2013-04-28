@@ -60,6 +60,13 @@ public class ServerThread extends Thread {
 		catch (InterruptedException ex) {
 			// Server is shutting down
 		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+			System.out.println("A fatal error occurred - please restart your server and report this to dreadiscool!");
+			System.out.println("A temporary fix has been applied.");
+			PowerBlock.getServer().getPluginManager().unload();
+			run();
+		}
 	}
 	
 	public void dispatchCommand(String command) {

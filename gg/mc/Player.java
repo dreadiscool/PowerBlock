@@ -14,6 +14,7 @@ import gg.mc.events.PlayerChatEvent;
 import gg.mc.events.PlayerKickEvent;
 import gg.mc.events.PlayerKickEvent.Reason;
 import gg.mc.events.PlayerLoginEvent;
+import gg.mc.events.PlayerMoveEvent;
 import gg.mc.events.PlayerQuitEvent;
 import gg.mc.network.ConnectionThread;
 import gg.mc.network.PacketInputStream;
@@ -43,6 +44,7 @@ public class Player {
 	private boolean disconnected = false;
 	
 	private World world;
+	private Position position = new Position(0, 0, 0, (byte) 0, (byte) 0);
 	
 	public Player(ConnectionThread connectionThread, Socket socket) throws IOException {
 		this.connectionThread = connectionThread;
@@ -103,7 +105,7 @@ public class Player {
 					}
 					else {
 						// Event
-						BlockBreakEvent e = new BlockBreakEvent(this, new Position(packet.getXPos(), packet.getYPos(), packet.getZPos(), (byte) 0, (byte) 0), b1, packet.getBlockType());
+						BlockBreakEvent e = new BlockBreakEvent(this, packet.getXPos(), packet.getYPos(), packet.getZPos(), b1, packet.getBlockType());
 						PowerBlock.getServer().getPluginManager().callEvent(e);
 						if (e.isCancelled()) {
 							packetOutputStream.writePacket(new Packet6SetBlock(packet.getXPos(), packet.getYPos(), packet.getZPos(), b1));
@@ -113,7 +115,17 @@ public class Player {
 					}
 				}
 				else if (incoming instanceof Packet8Position) {
+					Packet8Position packet = (Packet8Position) incoming;
 					
+					// Event
+					PlayerMoveEvent e = new PlayerMoveEvent(this, position, packet.getXPos(), packet.getYPos(), packet.getZPos(), packet.getYaw(), packet.getPitch());
+					PowerBlock.getServer().getPluginManager().callEvent(e);
+					if (e.isCancelled()) {
+						packetOutputStream.writePacket(new Packet8Position((byte) -1, position.getX(), position.getY(), position.getZ(), position.getYaw(), position.getPitch()));
+						return;
+					}
+					// Update pos to all
+					this.position = new Position(packet.getXPos(), packet.getYPos(), packet.getZPos(), packet.getYaw(), packet.getPitch());
 				}
 				else if (incoming instanceof Packet13Message) {
 					Packet13Message packet = (Packet13Message) incoming;
@@ -141,8 +153,8 @@ public class Player {
 			}
 		}
 		catch (Exception ex) {
-			kick(ex.getMessage(), Reason.LOST_CONNECTION);
 			ex.printStackTrace();
+			kick(ex.getMessage(), Reason.LOST_CONNECTION);
 		}
 	}
 	
@@ -257,5 +269,9 @@ public class Player {
 	
 	public String getInetAddress() {
 		return inetAddress;
+	}
+	
+	public Position getPosition() {
+		return position;
 	}
 }

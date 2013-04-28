@@ -137,6 +137,11 @@ public class PluginManager {
 					iter.next().onBlockPlace((BlockPlaceEvent) event);
 				}
 			}
+			else if (event instanceof PlayerMoveEvent) {
+				while (iter.hasNext()) {
+					iter.next().onPlayerMove((PlayerMoveEvent) event);
+				}
+			}
 			else {
 				throw new InvalidEventException(event);
 			}
