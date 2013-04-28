@@ -225,24 +225,18 @@ public class Player {
 	}
 	
 	public void kick(String message, Reason reason) {
-		if (!disconnected) {
-			if (loggedIn) {
-				System.out.println(getUsername() + " [" + getInetAddress() + "] disconnected from server");
-			}
-			else {
-				System.out.println("[" + getInetAddress() + "] lost connection to the server");
-			}
-		}
 		if (reason != Reason.LOST_CONNECTION) {
-			PlayerKickEvent e = new PlayerKickEvent("Server", this, message);
-			PowerBlock.getServer().getPluginManager().callEvent(e);
-			if (e.isCancelled()) {
-				return;
+			if (loggedIn && !disconnected) {
+				PlayerKickEvent e = new PlayerKickEvent("Server", this, message);
+				PowerBlock.getServer().getPluginManager().callEvent(e);
+				if (e.isCancelled()) {
+					return;
+				}
+				if (e.getReason() == null) {
+					e.setReason("You were kicked from the server!");
+				}
+				message = e.getReason();
 			}
-			if (e.getReason() == null) {
-				e.setReason("You were kicked from the server!");
-			}
-			message = e.getReason();
 		}
 		try {
 			packetOutputStream.writePacket(new Packet14Disconnect(message));
@@ -250,15 +244,18 @@ public class Player {
 		catch (Exception ex) {
 			// Well hell, they were getting kicked anyway
 		}
+		
+		if (loggedIn && !disconnected) {
+			// Event
+			PlayerQuitEvent ev = new PlayerQuitEvent(this);
+			PowerBlock.getServer().getPluginManager().callEvent(ev);
+			if (ev.getQuitMessage() != null) {
+				PowerBlock.getServer().broadcastMessage(ev.getQuitMessage());
+			}
+		}
+		
 		connectionThread.removePlayer(this);
 		disconnected = true;
-		
-		// Event
-		PlayerQuitEvent ev = new PlayerQuitEvent(this);
-		PowerBlock.getServer().getPluginManager().callEvent(ev);
-		if (ev.getQuitMessage() != null) {
-			PowerBlock.getServer().broadcastMessage(ev.getQuitMessage());
-		}
 		
 		if (world != null) {
 			world.reclaimEid(entityId);
