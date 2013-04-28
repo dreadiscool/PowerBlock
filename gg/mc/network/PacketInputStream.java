@@ -31,7 +31,7 @@ public class PacketInputStream {
 	}
 	
 	private DataInputStream inputStream;
-	private byte currentHeader;
+	private byte currentHeader = (byte) -1;
 	private byte[] payload;
 	
 	public PacketInputStream(InputStream inputStream) {
@@ -40,7 +40,7 @@ public class PacketInputStream {
 	
 	public boolean hasPacket() throws IOException {
 		if (currentHeader == -1) {
-			if (inputStream.available() >= 0) {
+			if (inputStream.available() > 0) {
 				currentHeader = inputStream.readByte();
 			}
 			else {
