@@ -213,6 +213,9 @@ public class Player {
 	}
 	
 	public void sendMessage(String message) {
+		if (disconnected || !loggedIn) {
+			return;
+		}
 		try {
 			packetOutputStream.writePacket(new Packet13Message(message));
 		}
