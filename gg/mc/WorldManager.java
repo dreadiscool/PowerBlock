@@ -59,6 +59,14 @@ public class WorldManager {
 		}
 	}
 	
+	public void unloadWorld(String name, boolean save) {
+		if (save) {
+			getWorld(name).save();
+		}
+		worlds.remove(name);
+		System.out.println("Removed world '" + name + "'.");
+	}
+	
 	public World getMainWorld() {
 		return getWorld("world");
 	}
