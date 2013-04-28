@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import gg.mc.exceptions.NoAvailableEIDException;
 import gg.mc.network.packets.Packet;
@@ -68,7 +70,8 @@ public class World {
 	public void load() {
 		File file = new File(System.getProperty("user.dir") + File.separator + "worlds" + File.separator + name + ".world");
 		try {
-			DataInputStream dis = new DataInputStream(new FileInputStream(file));
+			GZIPInputStream gis = new GZIPInputStream(new FileInputStream(file));
+			DataInputStream dis = new DataInputStream(gis);
 			length = dis.readShort();
 			depth = dis.readShort();
 			height = dis.readShort();
@@ -81,6 +84,7 @@ public class World {
 			data = new byte[length * depth * height];
 			dis.read(data);
 			dis.close();
+			gis.close();
 		}
 		catch (Exception ex) {
 			System.out.println("Failed to load map '" + name + "'!");
@@ -90,7 +94,8 @@ public class World {
 	public void save() {
 		File file = new File(System.getProperty("user.dir") + File.separator + "worlds" + File.separator + name + ".world");
 		try {
-			DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+			GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(file));
+			DataOutputStream dos = new DataOutputStream(gos);
 			dos.writeShort(length);
 			dos.writeShort(depth);
 			dos.writeShort(height);
@@ -102,6 +107,8 @@ public class World {
 			dos.write(data);
 			dos.flush();
 			dos.close();
+			gos.flush();
+			gos.close();
 		}
 		catch (Exception ex) {
 			System.out.println("Failed to save map '" + name + "'!");
